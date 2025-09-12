@@ -105,6 +105,88 @@ Cypress.Commands.add('interceptAuthRequests', () => {
   cy.intercept('GET', '/api/auth/profile').as('profileRequest');
 });
 
+// Custom commands for questions management
+Cypress.Commands.add('login', (email: string, password: string) => {
+  cy.request({
+    method: 'POST',
+    url: `${Cypress.env('API_URL')}/api/auth/login`,
+    body: { email, password },
+    failOnStatusCode: false
+  }).then((response) => {
+    if (response.status === 200 && response.body.success) {
+      const { accessToken } = response.body.data.tokens;
+      cy.window().then((win) => {
+        win.localStorage.setItem('accessToken', accessToken);
+      });
+    }
+  });
+});
+
+// Create a test subject for questions
+Cypress.Commands.add('createTestSubject', () => {
+  cy.window().then((win) => {
+    const token = win.localStorage.getItem('accessToken');
+    if (token) {
+      cy.request({
+        method: 'POST',
+        url: `${Cypress.env('API_URL')}/api/v1/subjects`,
+        headers: {
+          'Authorization': `Bearer ${token}`
+        },
+        body: {
+          code: 'TEST_MATH',
+          nameZh: 'Test Mathematics',
+          nameEn: 'Test Mathematics',
+          description: 'Test subject for E2E tests',
+          color: '#FF5722'
+        },
+        failOnStatusCode: false
+      });
+    }
+  });
+});
+
+// Create a test question
+Cypress.Commands.add('createTestQuestion', (questionData: any) => {
+  cy.window().then((win) => {
+    const token = win.localStorage.getItem('accessToken');
+    if (token) {
+      // First, get available subjects to use one
+      cy.request({
+        method: 'GET',
+        url: `${Cypress.env('API_URL')}/api/v1/subjects`,
+        headers: {
+          'Authorization': `Bearer ${token}`
+        },
+        failOnStatusCode: false
+      }).then((subjectsResponse) => {
+        if (subjectsResponse.status === 200 && subjectsResponse.body.data.length > 0) {
+          const subjectId = subjectsResponse.body.data[0].id;
+          
+          cy.request({
+            method: 'POST',
+            url: `${Cypress.env('API_URL')}/api/v1/questions`,
+            headers: {
+              'Authorization': `Bearer ${token}`
+            },
+            body: {
+              ...questionData,
+              subjectId
+            },
+            failOnStatusCode: false
+          });
+        }
+      });
+    }
+  });
+});
+
+// Keyboard navigation helper
+Cypress.Commands.add('tab', { prevSubject: 'optional' }, (subject) => {
+  const el = subject ? cy.wrap(subject) : cy.focused();
+  return el.trigger('keydown', { key: 'Tab' });
+});
+
 // Extend Cypress chainable interface
 declare global {
   namespace Cypress {
@@ -112,6 +194,10 @@ declare global {
       shouldBeAuthenticated(): Chainable<void>;
       shouldBeUnauthenticated(): Chainable<void>;
       interceptAuthRequests(): Chainable<void>;
+      login(email: string, password: string): Chainable<void>;
+      createTestSubject(): Chainable<void>;
+      createTestQuestion(questionData: any): Chainable<void>;
+      tab(): Chainable<JQuery<HTMLElement>>;
     }
   }
 }
