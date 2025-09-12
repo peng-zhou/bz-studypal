@@ -155,6 +155,52 @@ export const subjectsAPI = {
   },
 };
 
+// 错题管理API
+export const questionsAPI = {
+  // 获取错题列表
+  getQuestions: async (query?: string) => {
+    const url = query ? `/api/v1/questions?${query}` : '/api/v1/questions';
+    const response = await api.get(url);
+    return response.data;
+  },
+
+  // 根据ID获取错题
+  getQuestionById: async (id: string) => {
+    const response = await api.get(`/api/v1/questions/${id}`);
+    return response.data;
+  },
+
+  // 创建错题
+  createQuestion: async (data: CreateQuestionData) => {
+    const response = await api.post('/api/v1/questions', data);
+    return response.data;
+  },
+
+  // 更新错题
+  updateQuestion: async (id: string, data: UpdateQuestionData) => {
+    const response = await api.put(`/api/v1/questions/${id}`, data);
+    return response.data;
+  },
+
+  // 删除错题
+  deleteQuestion: async (id: string) => {
+    const response = await api.delete(`/api/v1/questions/${id}`);
+    return response.data;
+  },
+
+  // 批量删除错题
+  batchDeleteQuestions: async (questionIds: string[]) => {
+    const response = await api.post('/api/v1/questions/batch/delete', { questionIds });
+    return response.data;
+  },
+
+  // 获取错题统计
+  getQuestionStats: async () => {
+    const response = await api.get('/api/v1/questions/stats');
+    return response.data;
+  },
+};
+
 // 类型定义
 export interface LoginData {
   email: string;
@@ -234,4 +280,95 @@ export interface SubjectsOrderData {
     id: string;
     order: number;
   }>;
+}
+
+// 错题相关接口定义
+export interface Question {
+  id: string;
+  title?: string;
+  content: string;
+  images?: string[];
+  myAnswer: string;
+  correctAnswer: string;
+  explanation?: string;
+  subjectId: string;
+  difficulty: 'EASY' | 'MEDIUM' | 'HARD';
+  languageType: 'CHINESE' | 'ENGLISH' | 'BILINGUAL';
+  errorType: 'CALCULATION' | 'CONCEPTUAL' | 'CARELESS' | 'METHODOLOGICAL' | 'KNOWLEDGE' | 'OTHER';
+  masteryLevel: 'NOT_MASTERED' | 'PARTIALLY_MASTERED' | 'MASTERED';
+  knowledgePoints?: string[];
+  tags?: string[];
+  subject?: Subject;
+  addedAt: string;
+  lastReviewedAt?: string;
+  reviewCount: number;
+  _count?: {
+    reviews: number;
+    bookmarks: number;
+  };
+}
+
+export interface CreateQuestionData {
+  title?: string;
+  content: string;
+  images?: string[];
+  myAnswer: string;
+  correctAnswer: string;
+  explanation?: string;
+  subjectId: string;
+  difficulty?: 'EASY' | 'MEDIUM' | 'HARD';
+  languageType?: 'CHINESE' | 'ENGLISH' | 'BILINGUAL';
+  errorType?: 'CALCULATION' | 'CONCEPTUAL' | 'CARELESS' | 'METHODOLOGICAL' | 'KNOWLEDGE' | 'OTHER';
+  knowledgePoints?: string[];
+  tags?: string[];
+}
+
+export interface UpdateQuestionData {
+  title?: string;
+  content?: string;
+  images?: string[];
+  myAnswer?: string;
+  correctAnswer?: string;
+  explanation?: string;
+  subjectId?: string;
+  difficulty?: 'EASY' | 'MEDIUM' | 'HARD';
+  languageType?: 'CHINESE' | 'ENGLISH' | 'BILINGUAL';
+  errorType?: 'CALCULATION' | 'CONCEPTUAL' | 'CARELESS' | 'METHODOLOGICAL' | 'KNOWLEDGE' | 'OTHER';
+  masteryLevel?: 'NOT_MASTERED' | 'PARTIALLY_MASTERED' | 'MASTERED';
+  knowledgePoints?: string[];
+  tags?: string[];
+}
+
+export interface QuestionStats {
+  totalCount: number;
+  recentWeekCount: number;
+  bySubject: Array<{ subjectId: string; _count: number; subject?: Subject }>;
+  byDifficulty: Array<{ difficulty: string; _count: number }>;
+  byMastery: Array<{ masteryLevel: string; _count: number }>;
+  byErrorType: Array<{ errorType: string; _count: number }>;
+}
+
+export interface QuestionFilters {
+  subjectId?: string;
+  difficulty?: string;
+  masteryLevel?: string;
+  errorType?: string;
+  search?: string;
+  sortBy?: string;
+  sortOrder?: 'asc' | 'desc';
+  page?: number;
+  limit?: number;
+}
+
+export interface QuestionsPaginationResponse {
+  success: boolean;
+  data: Question[];
+  pagination: {
+    page: number;
+    limit: number;
+    totalCount: number;
+    totalPages: number;
+    hasNextPage: boolean;
+    hasPrevPage: boolean;
+  };
 }
