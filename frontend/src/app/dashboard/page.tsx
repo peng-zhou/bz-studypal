@@ -1,155 +1,249 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../stores/authStore';
 import { useRouter } from 'next/navigation';
+import { questionsAPI, subjectsAPI } from '../../lib/api';
+import AppLayout from '../../components/layout/AppLayout';
+
+interface DashboardStats {
+  totalQuestions: number;
+  thisWeekQuestions: number;
+  notMasteredQuestions: number;
+  masteredQuestions: number;
+  totalSubjects: number;
+  recentActivity: {
+    id: string;
+    type: 'question_added' | 'question_reviewed' | 'subject_created';
+    message: string;
+    timestamp: string;
+  }[];
+}
 
 export default function DashboardPage() {
-  const { user, logout, isAuthenticated } = useAuth();
+  const { t } = useTranslation();
+  const { user } = useAuth();
   const router = useRouter();
+  const [stats, setStats] = useState<DashboardStats>({
+    totalQuestions: 0,
+    thisWeekQuestions: 0,
+    notMasteredQuestions: 0,
+    masteredQuestions: 0,
+    totalSubjects: 0,
+    recentActivity: []
+  });
+  const [loading, setLoading] = useState(true);
 
-  // 如果用户未认证，重定向到登录页
-  React.useEffect(() => {
-    if (!isAuthenticated) {
-      router.push('/auth/login');
+  // Fetch dashboard data
+  useEffect(() => {
+    const fetchDashboardData = async () => {
+      try {
+        setLoading(true);
+        
+        // Fetch statistics data in parallel
+        const [questionStatsRes, subjectsRes] = await Promise.all([
+          questionsAPI.getQuestionStats(),
+          subjectsAPI.getSubjects()
+        ]);
+        
+        if (questionStatsRes.success) {
+          const questionStats = questionStatsRes.data;
+          const newStats: DashboardStats = {
+            totalQuestions: questionStats.totalCount || 0,
+            thisWeekQuestions: questionStats.recentWeekCount || 0,
+            notMasteredQuestions: questionStats.byMastery.find(m => m.masteryLevel === 'NOT_MASTERED')?._count || 0,
+            masteredQuestions: questionStats.byMastery.find(m => m.masteryLevel === 'MASTERED')?._count || 0,
+            totalSubjects: subjectsRes.success ? subjectsRes.data.length : 0,
+            recentActivity: [
+              {
+                id: '1',
+                type: 'question_added',
+                message: t('dashboard.recentActivity'),
+                timestamp: new Date().toISOString()
+              }
+            ]
+          };
+          setStats(newStats);
+        }
+      } catch (error) {
+        console.error('Failed to fetch dashboard data:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    if (user) {
+      fetchDashboardData();
     }
-  }, [isAuthenticated, router]);
+  }, [user, t]);
 
-  const handleLogout = async () => {
-    await logout();
-    router.push('/');
-  };
-
-  if (!isAuthenticated || !user) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-100">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">加载中...</p>
-        </div>
-      </div>
-    );
+  if (!user) {
+    return <div>{t('common.loading')}</div>;
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* 顶部导航 */}
-      <nav className="bg-white shadow-sm border-b">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-4">
-            <div className="flex items-center space-x-4">
-              <div className="text-2xl">🎓</div>
-              <h1 className="text-xl font-semibold text-gray-900">BZ StudyPal</h1>
-            </div>
-            <div className="flex items-center space-x-4">
-              <span className="text-sm text-gray-600">
-                欢迎, {user.name}
-              </span>
-              <button
-                onClick={handleLogout}
-                className="px-4 py-2 text-sm text-red-600 hover:text-red-800 border border-red-600 hover:border-red-800 rounded-md transition-colors"
-              >
-                退出登录
-              </button>
-            </div>
-          </div>
+    <AppLayout 
+      title={t('dashboard.title')} 
+      description={t('dashboard.description')}
+      showBreadcrumb={false}
+    >
+      {/* Statistics Data Cards */}
+      {loading ? (
+        <div className="flex justify-center items-center min-h-[200px]">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+          <span className="ml-2 text-gray-600">{t('common.loading')}</span>
         </div>
-      </nav>
-
-      {/* 主要内容区 */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="mb-8">
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">学习控制台</h2>
-          <p className="text-gray-600">管理您的错题和复习计划</p>
-        </div>
-
-        {/* 用户信息卡片 */}
-        <div className="bg-white rounded-lg shadow-sm p-6 mb-8">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">用户信息</h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label className="text-sm font-medium text-gray-500">姓名</label>
-              <p className="text-gray-900">{user.name}</p>
-            </div>
-            <div>
-              <label className="text-sm font-medium text-gray-500">邮箱</label>
-              <p className="text-gray-900">{user.email}</p>
-            </div>
-            <div>
-              <label className="text-sm font-medium text-gray-500">首选语言</label>
-              <p className="text-gray-900">{user.preferredLanguage === 'zh' ? '中文' : 'English'}</p>
-            </div>
-            <div>
-              <label className="text-sm font-medium text-gray-500">注册时间</label>
-              <p className="text-gray-900">
-                {user.createdAt ? new Date(user.createdAt).toLocaleDateString('zh-CN') : '未知'}
-              </p>
-            </div>
-          </div>
-        </div>
-
-        {/* 功能卡片 */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {/* 科目管理 */}
-          <div className="bg-white rounded-lg shadow-sm p-6 hover:shadow-md transition-shadow">
-            <div className="flex items-center mb-4">
-              <div className="text-3xl mr-3">🏷️</div>
-              <h3 className="text-lg font-semibold text-gray-900">科目管理</h3>
-            </div>
-            <p className="text-gray-600 mb-4">管理学习科目和分类</p>
-            <button 
-              onClick={() => router.push('/subjects')}
-              className="w-full py-2 px-4 bg-indigo-600 hover:bg-indigo-700 text-white rounded-md transition-colors"
-            >
-              管理科目
-            </button>
-          </div>
-          
-          {/* 错题管理 */}
-          <div className="bg-white rounded-lg shadow-sm p-6 hover:shadow-md transition-shadow">
-            <div className="flex items-center mb-4">
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          <div className="bg-white rounded-lg shadow-sm p-6">
+            <div className="flex items-center">
               <div className="text-3xl mr-3">📚</div>
-              <h3 className="text-lg font-semibold text-gray-900">错题管理</h3>
+              <div>
+                <div className="text-2xl font-bold text-blue-600">{stats.totalQuestions}</div>
+                <div className="text-sm text-gray-600">{t('questions.totalQuestions')}</div>
+              </div>
             </div>
-            <p className="text-gray-600 mb-4">添加、编辑和分类您的错题</p>
-            <button className="w-full py-2 px-4 bg-blue-600 hover:bg-blue-700 text-white rounded-md transition-colors">
-              管理错题
-            </button>
           </div>
-
-          {/* 学习统计 */}
-          <div className="bg-white rounded-lg shadow-sm p-6 hover:shadow-md transition-shadow">
-            <div className="flex items-center mb-4">
-              <div className="text-3xl mr-3">📈</div>
-              <h3 className="text-lg font-semibold text-gray-900">学习统计</h3>
+          <div className="bg-white rounded-lg shadow-sm p-6">
+            <div className="flex items-center">
+              <div className="text-3xl mr-3">✨</div>
+              <div>
+                <div className="text-2xl font-bold text-green-600">{stats.thisWeekQuestions}</div>
+                <div className="text-sm text-gray-600">{t('questions.thisWeek')}</div>
+              </div>
             </div>
-            <p className="text-gray-600 mb-4">查看您的学习进度和统计</p>
-            <button className="w-full py-2 px-4 bg-green-600 hover:bg-green-700 text-white rounded-md transition-colors">
-              查看统计
-            </button>
           </div>
-
-          {/* 复习计划 */}
-          <div className="bg-white rounded-lg shadow-sm p-6 hover:shadow-md transition-shadow">
-            <div className="flex items-center mb-4">
-              <div className="text-3xl mr-3">📝</div>
-              <h3 className="text-lg font-semibold text-gray-900">复习计划</h3>
+          <div className="bg-white rounded-lg shadow-sm p-6">
+            <div className="flex items-center">
+              <div className="text-3xl mr-3">⚠️</div>
+              <div>
+                <div className="text-2xl font-bold text-orange-600">{stats.notMasteredQuestions}</div>
+                <div className="text-sm text-gray-600">{t('questions.notMastered')}</div>
+              </div>
             </div>
-            <p className="text-gray-600 mb-4">制定和执行复习计划</p>
-            <button className="w-full py-2 px-4 bg-purple-600 hover:bg-purple-700 text-white rounded-md transition-colors">
-              开始复习
-            </button>
+          </div>
+          <div className="bg-white rounded-lg shadow-sm p-6">
+            <div className="flex items-center">
+              <div className="text-3xl mr-3">✅</div>
+              <div>
+                <div className="text-2xl font-bold text-purple-600">{stats.masteredQuestions}</div>
+                <div className="text-sm text-gray-600">{t('questions.mastered')}</div>
+              </div>
+            </div>
           </div>
         </div>
-
-        {/* 最近活动 */}
-        <div className="mt-8 bg-white rounded-lg shadow-sm p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">最近活动</h3>
-          <div className="text-center py-8 text-gray-500">
-            暂无活动记录
+      )}
+      
+      {/* User Information Card */}
+      <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
+        <h3 className="text-lg font-semibold text-gray-900 mb-4">{t('settings.profile')}</h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label className="text-sm font-medium text-gray-500">{t('dashboard.userInfo.name')}</label>
+            <p className="text-gray-900">{user.name}</p>
+          </div>
+          <div>
+            <label className="text-sm font-medium text-gray-500">{t('dashboard.userInfo.email')}</label>
+            <p className="text-gray-900">{user.email}</p>
+          </div>
+          <div>
+            <label className="text-sm font-medium text-gray-500">{t('dashboard.userInfo.preferredLanguage')}</label>
+            <p className="text-gray-900">{user.preferredLanguage === 'zh' ? t('dashboard.userInfo.chinese') : t('dashboard.userInfo.english')}</p>
+          </div>
+          <div>
+            <label className="text-sm font-medium text-gray-500">{t('dashboard.userInfo.memberSince')}</label>
+            <p className="text-gray-900">
+              {user.createdAt ? new Date(user.createdAt).toLocaleDateString('zh-CN') : t('common.unknown')}
+            </p>
           </div>
         </div>
-      </main>
-    </div>
+      </div>
+
+      {/* Feature Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {/* Subject Management */}
+        <div className="bg-white rounded-lg shadow-sm p-6 hover:shadow-md transition-shadow">
+          <div className="flex items-center mb-4">
+            <div className="text-3xl mr-3">🏷️</div>
+            <h3 className="text-lg font-semibold text-gray-900">{t('subjects.title')}</h3>
+          </div>
+          <p className="text-gray-600 mb-4">{t('subjects.description')}</p>
+          <button 
+            onClick={() => router.push('/subjects')}
+            className="w-full py-2 px-4 bg-indigo-600 hover:bg-indigo-700 text-white rounded-md transition-colors"
+          >
+            {t('navigation.subjects')}
+          </button>
+        </div>
+        
+        {/* Question Management */}
+        <div className="bg-white rounded-lg shadow-sm p-6 hover:shadow-md transition-shadow">
+          <div className="flex items-center mb-4">
+            <div className="text-3xl mr-3">📚</div>
+            <h3 className="text-lg font-semibold text-gray-900">{t('questions.title')}</h3>
+          </div>
+          <p className="text-gray-600 mb-4">{t('questions.description')}</p>
+          <button 
+            onClick={() => router.push('/questions')}
+            className="w-full py-2 px-4 bg-blue-600 hover:bg-blue-700 text-white rounded-md transition-colors"
+          >
+            {t('navigation.questions')}
+          </button>
+        </div>
+
+        {/* Learning Statistics */}
+        <div className="bg-white rounded-lg shadow-sm p-6 hover:shadow-md transition-shadow">
+          <div className="flex items-center mb-4">
+            <div className="text-3xl mr-3">📈</div>
+            <h3 className="text-lg font-semibold text-gray-900">{t('dashboard.learningProgress')}</h3>
+          </div>
+          <p className="text-gray-600 mb-4">{t('dashboard.learningStatsDesc')}</p>
+          <button className="w-full py-2 px-4 bg-green-600 hover:bg-green-700 text-white rounded-md transition-colors">
+            {t('dashboard.viewStats')}
+          </button>
+        </div>
+
+        {/* Review Plan */}
+        <div className="bg-white rounded-lg shadow-sm p-6 hover:shadow-md transition-shadow">
+          <div className="flex items-center mb-4">
+            <div className="text-3xl mr-3">📝</div>
+            <h3 className="text-lg font-semibold text-gray-900">{t('navigation.reviews')}</h3>
+          </div>
+          <p className="text-gray-600 mb-4">{t('dashboard.reviewPlanDesc')}</p>
+          <button className="w-full py-2 px-4 bg-purple-600 hover:bg-purple-700 text-white rounded-md transition-colors">
+            {t('dashboard.startReview')}
+          </button>
+        </div>
+      </div>
+
+      {/* Recent Activity */}
+      <div className="bg-white rounded-lg shadow-sm p-6">
+        <h3 className="text-lg font-semibold text-gray-900 mb-4">{t('dashboard.recentActivity')}</h3>
+        <div className="text-center py-8 text-gray-500">
+          {stats.recentActivity.length > 0 ? (
+            <div className="space-y-3">
+              {stats.recentActivity.map((activity) => (
+                <div key={activity.id} className="flex items-center p-3 bg-gray-50 rounded-lg">
+                  <div className="text-xl mr-3">
+                    {activity.type === 'question_added' && '➕'}
+                    {activity.type === 'question_reviewed' && '✔️'}
+                    {activity.type === 'subject_created' && '🏷️'}
+                  </div>
+                  <div className="flex-1 text-left">
+                    <p className="text-sm text-gray-900">{activity.message}</p>
+                    <p className="text-xs text-gray-500">
+                      {new Date(activity.timestamp).toLocaleDateString()}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p>{t('dashboard.noRecentActivity')}</p>
+          )}
+        </div>
+      </div>
+    </AppLayout>
   );
 }

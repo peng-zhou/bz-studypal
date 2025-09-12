@@ -55,5 +55,39 @@
     "weeksAgo": "{{count}} week(s) ago",
     "monthsAgo": "{{count}} month(s) ago",
     "yearsAgo": "{{count}} year(s) ago"
-  }
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "welcome": "Welcome back",
+    "quickStats": "Quick Stats",
+    "totalQuestions": "Total Questions",
+    "recentWeekQuestions": "This Week",
+    "masteredQuestions": "Mastered",
+    "quickActions": "Quick Actions",
+    "questionManagement": "Question Management",
+    "questionManagementDesc": "Manage your wrong questions",
+    "subjectManagement": "Subject Management",
+    "subjectManagementDesc": "Manage subjects and categories",
+    "learningStats": "Learning Statistics",
+    "learningStatsDesc": "View learning progress",
+    "reviewPlan": "Review Plan",
+    "reviewPlanDesc": "Plan your learning schedule",
+    "recentActivity": "Recent Activity",
+    "recentActivityDesc": "Your recent learning activities",
+    "userInfo": {
+      "name": "Name",
+      "email": "Email",
+      "preferredLanguage": "Preferred Language",
+      "chinese": "Chinese",
+      "english": "English",
+      "memberSince": "Member since",
+      "role": "Role",
+      "status": "Status",
+      "logout": "Logout"
+    },
+    "viewStats": "View Statistics",
+    "startReview": "Start Review",
+    "noRecentActivity": "No recent activity"
+  },
+  "unknown": "Unknown"
 }

@@ -49,11 +49,45 @@
   },
   "time": {
     "now": "刚刚",
-    "minutesAgo": "{{count}}分钟前",
-    "hoursAgo": "{{count}}小时前",
-    "daysAgo": "{{count}}天前",
-    "weeksAgo": "{{count}}周前",
-    "monthsAgo": "{{count}}个月前",
-    "yearsAgo": "{{count}}年前"
-  }
+    "minutesAgo": "{{count}} 分钟前",
+    "hoursAgo": "{{count}} 小时前",
+    "daysAgo": "{{count}} 天前",
+    "weeksAgo": "{{count}} 周前",
+    "monthsAgo": "{{count}} 月前",
+    "yearsAgo": "{{count}} 年前"
+  },
+  "dashboard": {
+    "title": "仪表板",
+    "welcome": "欢迎回来",
+    "quickStats": "快速统计",
+    "totalQuestions": "总题目数",
+    "recentWeekQuestions": "本周新增",
+    "masteredQuestions": "已掌握",
+    "quickActions": "快速操作",
+    "questionManagement": "题目管理",
+    "questionManagementDesc": "管理您的错题",
+    "subjectManagement": "科目管理",
+    "subjectManagementDesc": "管理科目和分类",
+    "learningStats": "学习统计",
+    "learningStatsDesc": "查看学习进度",
+    "reviewPlan": "复习计划",
+    "reviewPlanDesc": "规划学习计划",
+    "recentActivity": "最近活动",
+    "recentActivityDesc": "您最近的学习活动",
+    "userInfo": {
+      "name": "姓名",
+      "email": "邮箱",
+      "preferredLanguage": "首选语言",
+      "chinese": "中文",
+      "english": "English",
+      "memberSince": "注册时间",
+      "role": "角色",
+      "status": "状态",
+      "logout": "退出登录"
+    },
+    "viewStats": "查看统计",
+    "startReview": "开始复习",
+    "noRecentActivity": "暂无活动记录"
+  },
+  "unknown": "未知"
 }
