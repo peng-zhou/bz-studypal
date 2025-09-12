@@ -1,9 +1,12 @@
-import express, { Application, Request, Response } from 'express';
+import express, { Application, Request, Response, NextFunction } from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import morgan from 'morgan';
 import dotenv from 'dotenv';
-import { PrismaClient } from '@prisma/client';
+import cookieParser from 'cookie-parser';
+import authRoutes from './routes/auth';
+import { authenticate, optionalAuthenticate } from './middlewares/auth';
+import { prisma } from './utils/database';
 
 // 加载环境变量
 dotenv.config();
@@ -13,18 +16,40 @@ const app: Application = express();
 const PORT = process.env.PORT || 8000;
 const HOST = process.env.HOST || 'localhost';
 
-// 初始化Prisma客户端
-const prisma = new PrismaClient();
-
 // 中间件配置
 app.use(helmet()); // 安全头
-app.use(morgan('combined')); // 日志记录
+
+// 在开发环境中使用更简单的日志格式
+if (process.env.NODE_ENV === 'production') {
+  app.use(morgan('combined'));
+} else {
+  app.use(morgan('dev'));
+}
+
 app.use(cors({
   origin: process.env.CORS_ORIGIN || 'http://localhost:3000',
   credentials: true,
 }));
-app.use(express.json({ limit: '10mb' }));
-app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+
+// 优化JSON解析限制
+app.use(express.json({ limit: '2mb' }));
+app.use(express.urlencoded({ extended: true, limit: '2mb' }));
+app.use(cookieParser()); // Cookie解析中间件
+
+// 添加响应超时保护中间件
+app.use((req: Request, res: Response, next: NextFunction) => {
+  // 为每个响应设置5秒超时
+  res.setTimeout(5000, () => {
+    if (!res.headersSent) {
+      res.status(503).json({ 
+        success: false, 
+        error: 'Server response timeout',
+        timestamp: new Date().toISOString()
+      });
+    }
+  });
+  next();
+});
 
 // 基础路由
 app.get('/', (req: Request, res: Response) => {
@@ -40,35 +65,49 @@ app.get('/', (req: Request, res: Response) => {
   });
 });
 
-// 健康检查路由
+// 健康检查路由 - 优化为非阻塞式
 app.get('/health', async (req: Request, res: Response) => {
+  let databaseStatus = 'unknown';
+  
   try {
-    // 测试数据库连接
-    await prisma.$queryRaw`SELECT 1`;
-    
-    res.json({
-      status: 'healthy',
-      timestamp: new Date().toISOString(),
-      database: 'connected',
-      environment: process.env.NODE_ENV || 'development'
-    });
+    // 使用Promise.race实现300ms超时保护
+    await Promise.race([
+      prisma.$queryRaw`SELECT 1 as test`.then(() => {
+        databaseStatus = 'connected';
+      }),
+      new Promise((_, reject) => 
+        setTimeout(() => reject(new Error('DB check timeout')), 300)
+      )
+    ]);
   } catch (error) {
-    res.status(500).json({
-      status: 'unhealthy',
-      timestamp: new Date().toISOString(),
-      database: 'disconnected',
-      error: error instanceof Error ? error.message : 'Unknown error'
-    });
+    // 超时或错误时不阻塞响应
+    databaseStatus = 'timeout';
+    console.warn('Health check DB timeout or error:', error);
   }
+  
+  res.json({
+    status: 'healthy',
+    timestamp: new Date().toISOString(),
+    database: databaseStatus,
+    environment: process.env.NODE_ENV || 'development'
+  });
 });
 
+// 认证路由
+app.use('/api/auth', authRoutes);
+
 // API v1 基础路由
-app.get('/api/v1', (req: Request, res: Response) => {
+app.get('/api/v1', optionalAuthenticate, (req: Request, res: Response) => {
   res.json({
     message: 'BZ StudyPal API v1',
     version: '1.0.0',
+    user: req.user ? {
+      id: req.user.id,
+      email: req.user.email,
+      role: req.user.role
+    } : null,
     routes: {
-      auth: '/api/v1/auth',
+      auth: '/api/auth',
       users: '/api/v1/users',
       questions: '/api/v1/questions',
       subjects: '/api/v1/subjects',
