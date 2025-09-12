@@ -5,7 +5,7 @@ export default function Home() {
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-600 to-purple-600">
       <div className="max-w-4xl mx-auto p-8">
         <div className="bg-white/95 backdrop-blur-sm rounded-3xl shadow-2xl p-12 text-center">
-          {/* Logo 和标题 */}
+          {/* Logo and Title */}
           <div className="mb-12">
             <div className="text-8xl mb-6">🎓</div>
             <h1 
@@ -21,7 +21,7 @@ export default function Home() {
             </p>
           </div>
 
-          {/* 功能介绍 */}
+          {/* Features Introduction */}
           <div className="mb-12">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
               <div className="text-center">
@@ -51,7 +51,7 @@ export default function Home() {
             </div>
           </div>
 
-          {/* 操作按钮 */}
+          {/* Action Buttons */}
           <div className="flex flex-col sm:flex-row gap-6 justify-center items-center mb-8">
             <Link
               href="/auth/login"
@@ -67,7 +67,7 @@ export default function Home() {
             </Link>
           </div>
 
-          {/* 版本信息 */}
+          {/* Version Information */}
           <div className="pt-8 border-t border-gray-200">
             <p className="text-sm text-gray-500">
               版本 1.0.0 - MVP 测试版

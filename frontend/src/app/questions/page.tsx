@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useTranslation } from 'react-i18next';
 import { useAuthStore } from '@/stores/authStore';
 import { api, questionsAPI, subjectsAPI } from '@/lib/api';
+import AppLayout from '../../components/layout/AppLayout';
 
 interface Subject {
   id: string;
@@ -67,9 +68,28 @@ interface FilterState {
   sortOrder: 'asc' | 'desc';
 }
 
+// Chinese display functions
+const getDifficultyText = (difficulty: string) => {
+  switch (difficulty) {
+    case 'EASY': return '简单';
+    case 'MEDIUM': return '中等';
+    case 'HARD': return '困难';
+    default: return difficulty;
+  }
+};
+
+const getMasteryText = (masteryLevel: string) => {
+  switch (masteryLevel) {
+    case 'NOT_MASTERED': return '未掌握';
+    case 'PARTIALLY_MASTERED': return '部分掌握';
+    case 'MASTERED': return '已掌握';
+    default: return masteryLevel;
+  }
+};
+
 export default function QuestionsPage() {
+  const { t } = useTranslation();
   const router = useRouter();
-  const { t } = useTranslation('questions');
   const { isAuthenticated, user } = useAuthStore();
   
   const [questions, setQuestions] = useState<Question[]>([]);
@@ -95,6 +115,33 @@ export default function QuestionsPage() {
   const [selectedQuestions, setSelectedQuestions] = useState<string[]>([]);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [editingQuestion, setEditingQuestion] = useState<Question | null>(null);
+  const [createFormData, setCreateFormData] = useState({
+    title: '',
+    content: '',
+    myAnswer: '',
+    correctAnswer: '',
+    explanation: '',
+    subjectId: '',
+    difficulty: 'MEDIUM' as 'EASY' | 'MEDIUM' | 'HARD',
+    languageType: 'CHINESE' as 'CHINESE' | 'ENGLISH' | 'BILINGUAL',
+    errorType: 'OTHER' as 'CALCULATION' | 'CONCEPTUAL' | 'CARELESS' | 'METHODOLOGICAL' | 'KNOWLEDGE' | 'OTHER',
+    knowledgePoints: [] as string[],
+    tags: [] as string[]
+  });
+  const [editFormData, setEditFormData] = useState({
+    title: '',
+    content: '',
+    myAnswer: '',
+    correctAnswer: '',
+    explanation: '',
+    subjectId: '',
+    difficulty: 'MEDIUM' as 'EASY' | 'MEDIUM' | 'HARD',
+    languageType: 'CHINESE' as 'CHINESE' | 'ENGLISH' | 'BILINGUAL',
+    errorType: 'OTHER' as 'CALCULATION' | 'CONCEPTUAL' | 'CARELESS' | 'METHODOLOGICAL' | 'KNOWLEDGE' | 'OTHER',
+    masteryLevel: 'NOT_MASTERED' as 'NOT_MASTERED' | 'PARTIALLY_MASTERED' | 'MASTERED',
+    knowledgePoints: [] as string[],
+    tags: [] as string[]
+  });
 
   // Redirect if not authenticated
   useEffect(() => {
@@ -209,7 +256,7 @@ export default function QuestionsPage() {
   const handleDeleteSelected = async () => {
     if (selectedQuestions.length === 0) return;
     
-    if (!confirm(t('confirmDeleteSelected', { count: selectedQuestions.length }))) {
+    if (!confirm(`确定要删除所选的 ${selectedQuestions.length} 道错题吗？此操作不可恢复。`)) {
       return;
     }
     
@@ -237,7 +284,7 @@ export default function QuestionsPage() {
   };
 
   const handleDeleteQuestion = async (questionId: string) => {
-    if (!confirm(t('confirmDelete'))) {
+    if (!confirm('确定要删除这道错题吗？此操作不可恢复。')) {
       return;
     }
     
@@ -260,13 +307,82 @@ export default function QuestionsPage() {
     }
   };
 
-  const handleCreateQuestion = async (questionData: any) => {
+  const resetCreateForm = () => {
+    setCreateFormData({
+      title: '',
+      content: '',
+      myAnswer: '',
+      correctAnswer: '',
+      explanation: '',
+      subjectId: '',
+      difficulty: 'MEDIUM',
+      languageType: 'CHINESE',
+      errorType: 'OTHER',
+      knowledgePoints: [],
+      tags: []
+    });
+  };
+
+  const initializeEditForm = (question: Question) => {
+    setEditFormData({
+      title: question.title || '',
+      content: question.content,
+      myAnswer: question.myAnswer,
+      correctAnswer: question.correctAnswer,
+      explanation: question.explanation || '',
+      subjectId: question.subjectId,
+      difficulty: question.difficulty,
+      languageType: question.languageType,
+      errorType: question.errorType,
+      masteryLevel: question.masteryLevel,
+      knowledgePoints: question.knowledgePoints || [],
+      tags: question.tags || []
+    });
+  };
+
+  const resetEditForm = () => {
+    setEditFormData({
+      title: '',
+      content: '',
+      myAnswer: '',
+      correctAnswer: '',
+      explanation: '',
+      subjectId: '',
+      difficulty: 'MEDIUM',
+      languageType: 'CHINESE',
+      errorType: 'OTHER',
+      masteryLevel: 'NOT_MASTERED',
+      knowledgePoints: [],
+      tags: []
+    });
+  };
+
+  const handleCreateQuestion = async () => {
+    // Basic validation
+    if (!createFormData.content.trim()) {
+      setError('请输入错题内容');
+      return;
+    }
+    if (!createFormData.myAnswer.trim()) {
+      setError('请输入您的答案');
+      return;
+    }
+    if (!createFormData.correctAnswer.trim()) {
+      setError('请输入正确答案');
+      return;
+    }
+    if (!createFormData.subjectId) {
+      setError('请选择科目');
+      return;
+    }
+
     try {
       setLoading(true);
-      const response = await questionsAPI.createQuestion(questionData);
+      const response = await questionsAPI.createQuestion(createFormData);
       
       if (response.success) {
         setShowCreateModal(false);
+        resetCreateForm();
         await loadQuestions();
         // Refresh stats
         const statsRes = await questionsAPI.getQuestionStats();
@@ -284,14 +400,40 @@ export default function QuestionsPage() {
     }
   };
 
-  const handleUpdateQuestion = async (questionId: string, questionData: any) => {
+  const handleUpdateQuestion = async () => {
+    if (!editingQuestion) return;
+    
+    // Basic validation
+    if (!editFormData.content.trim()) {
+      setError('请输入错题内容');
+      return;
+    }
+    if (!editFormData.myAnswer.trim()) {
+      setError('请输入您的答案');
+      return;
+    }
+    if (!editFormData.correctAnswer.trim()) {
+      setError('请输入正确答案');
+      return;
+    }
+    if (!editFormData.subjectId) {
+      setError('请选择科目');
+      return;
+    }
+
     try {
       setLoading(true);
-      const response = await questionsAPI.updateQuestion(questionId, questionData);
+      const response = await questionsAPI.updateQuestion(editingQuestion.id, editFormData);
       
       if (response.success) {
         setEditingQuestion(null);
+        resetEditForm();
         await loadQuestions();
+        // Refresh stats
+        const statsRes = await questionsAPI.getQuestionStats();
+        if (statsRes.success) {
+          setStats(statsRes.data);
+        }
       } else {
         setError(response.error || 'Failed to update question');
       }
@@ -307,24 +449,16 @@ export default function QuestionsPage() {
     return null; // Will redirect
   }
 
-  if (loading) {
-    return (
-      <div className="flex justify-center items-center min-h-[400px]" data-testid="loading">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-      </div>
-    );
-  }
-
   return (
-    <div className="container mx-auto px-4 py-8" data-testid="questions-page">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2" data-testid="page-title">
-          {t('title')}
-        </h1>
-        <p className="text-gray-600" data-testid="page-description">
-          {t('description')}
-        </p>
-      </div>
+    <AppLayout 
+      title={t('questions.title')} 
+      description={t('questions.description')}
+    >
+      {loading && (
+        <div className="flex justify-center items-center min-h-[400px]" data-testid="loading">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+        </div>
+      )}
 
       {error && (
         <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg" data-testid="error-message">
@@ -348,23 +482,23 @@ export default function QuestionsPage() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8" data-testid="stats-cards">
           <div className="bg-white p-6 rounded-lg shadow">
             <div className="text-2xl font-bold text-blue-600" data-testid="total-count">{stats.totalCount}</div>
-            <div className="text-sm text-gray-600">{t('stats.totalQuestions')}</div>
+            <div className="text-sm text-gray-600">错题总数</div>
           </div>
           <div className="bg-white p-6 rounded-lg shadow">
             <div className="text-2xl font-bold text-green-600" data-testid="recent-count">{stats.recentWeekCount}</div>
-            <div className="text-sm text-gray-600">{t('stats.thisWeek')}</div>
+            <div className="text-sm text-gray-600">本周新增</div>
           </div>
           <div className="bg-white p-6 rounded-lg shadow">
             <div className="text-2xl font-bold text-orange-600" data-testid="not-mastered-count">
               {stats.byMastery.find(m => m.masteryLevel === 'NOT_MASTERED')?._count || 0}
             </div>
-            <div className="text-sm text-gray-600">{t('stats.notMastered')}</div>
+            <div className="text-sm text-gray-600">未掌握</div>
           </div>
           <div className="bg-white p-6 rounded-lg shadow">
             <div className="text-2xl font-bold text-purple-600" data-testid="mastered-count">
               {stats.byMastery.find(m => m.masteryLevel === 'MASTERED')?._count || 0}
             </div>
-            <div className="text-sm text-gray-600">{t('stats.mastered')}</div>
+            <div className="text-sm text-gray-600">已掌握</div>
           </div>
         </div>
       )}
@@ -374,13 +508,13 @@ export default function QuestionsPage() {
         <div className="grid grid-cols-1 md:grid-cols-6 gap-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              {t('filters.search')}
+              搜索
             </label>
             <input
               type="text"
               value={filters.search}
               onChange={(e) => handleFilterChange('search', e.target.value)}
-              placeholder={t('filters.searchPlaceholder')}
+              placeholder="请输入关键词搜索..."
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
               data-testid="search-input"
             />
@@ -388,7 +522,7 @@ export default function QuestionsPage() {
           
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              {t('filters.subject')}
+              科目
             </label>
             <select
               value={filters.subjectId || ''}
@@ -396,7 +530,7 @@ export default function QuestionsPage() {
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
               data-testid="subject-filter"
             >
-              <option value="">{t('filters.allSubjects')}</option>
+              <option value="">全部科目</option>
               {subjects.map(subject => (
                 <option key={subject.id} value={subject.id}>
                   {subject.nameZh}
@@ -407,7 +541,7 @@ export default function QuestionsPage() {
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              {t('filters.difficulty')}
+              难度
             </label>
             <select
               value={filters.difficulty || ''}
@@ -415,16 +549,16 @@ export default function QuestionsPage() {
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
               data-testid="difficulty-filter"
             >
-              <option value="">{t('filters.allDifficulties')}</option>
-              <option value="EASY">{t('difficulty.easy')}</option>
-              <option value="MEDIUM">{t('difficulty.medium')}</option>
-              <option value="HARD">{t('difficulty.hard')}</option>
+              <option value="">全部难度</option>
+              <option value="EASY">简单</option>
+              <option value="MEDIUM">中等</option>
+              <option value="HARD">困难</option>
             </select>
           </div>
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              {t('filters.mastery')}
+              掌握程度
             </label>
             <select
               value={filters.masteryLevel || ''}
@@ -432,16 +566,16 @@ export default function QuestionsPage() {
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
               data-testid="mastery-filter"
             >
-              <option value="">{t('filters.allMastery')}</option>
-              <option value="NOT_MASTERED">{t('mastery.notMastered')}</option>
-              <option value="PARTIALLY_MASTERED">{t('mastery.partiallyMastered')}</option>
-              <option value="MASTERED">{t('mastery.mastered')}</option>
+              <option value="">全部程度</option>
+              <option value="NOT_MASTERED">未掌握</option>
+              <option value="PARTIALLY_MASTERED">部分掌握</option>
+              <option value="MASTERED">已掌握</option>
             </select>
           </div>
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              {t('filters.sortBy')}
+              排序方式
             </label>
             <select
               value={filters.sortBy}
@@ -449,16 +583,16 @@ export default function QuestionsPage() {
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
               data-testid="sort-by"
             >
-              <option value="addedAt">{t('sort.addedAt')}</option>
-              <option value="lastReviewedAt">{t('sort.lastReviewed')}</option>
-              <option value="reviewCount">{t('sort.reviewCount')}</option>
-              <option value="difficulty">{t('sort.difficulty')}</option>
+              <option value="addedAt">添加时间</option>
+              <option value="lastReviewedAt">最后复习</option>
+              <option value="reviewCount">复习次数</option>
+              <option value="difficulty">难度</option>
             </select>
           </div>
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              {t('filters.sortOrder')}
+              排序顺序
             </label>
             <select
               value={filters.sortOrder}
@@ -466,8 +600,8 @@ export default function QuestionsPage() {
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
               data-testid="sort-order"
             >
-              <option value="desc">{t('sort.descending')}</option>
-              <option value="asc">{t('sort.ascending')}</option>
+              <option value="desc">降序</option>
+              <option value="asc">升序</option>
             </select>
           </div>
         </div>
@@ -481,7 +615,7 @@ export default function QuestionsPage() {
             className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm font-medium"
             data-testid="create-question-btn"
           >
-            {t('actions.createQuestion')}
+添加错题
           </button>
           
           {selectedQuestions.length > 0 && (
@@ -490,17 +624,13 @@ export default function QuestionsPage() {
               className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md text-sm font-medium"
               data-testid="delete-selected-btn"
             >
-              {t('actions.deleteSelected', { count: selectedQuestions.length })}
+              删除所选 ({selectedQuestions.length})
             </button>
           )}
         </div>
 
         <div className="text-sm text-gray-600" data-testid="results-info">
-          {t('pagination.showing', {
-            start: (pagination.page - 1) * pagination.limit + 1,
-            end: Math.min(pagination.page * pagination.limit, pagination.totalCount),
-            total: pagination.totalCount
-          })}
+          显示 {(pagination.page - 1) * pagination.limit + 1}-{Math.min(pagination.page * pagination.limit, pagination.totalCount)} 条，共 {pagination.totalCount} 条
         </div>
       </div>
 
@@ -508,7 +638,7 @@ export default function QuestionsPage() {
       <div className="bg-white rounded-lg shadow overflow-hidden" data-testid="questions-list">
         {questions.length === 0 ? (
           <div className="p-8 text-center text-gray-500" data-testid="empty-state">
-            {t('emptyState')}
+            暂无错题数据
           </div>
         ) : (
           <>
@@ -522,7 +652,7 @@ export default function QuestionsPage() {
                   data-testid="select-all-checkbox"
                 />
                 <span className="ml-2 text-sm font-medium text-gray-700">
-                  {t('selectAll')}
+                  全选
                 </span>
               </label>
             </div>
@@ -559,31 +689,34 @@ export default function QuestionsPage() {
                             question.difficulty === 'MEDIUM' ? 'bg-yellow-100 text-yellow-800' :
                             'bg-red-100 text-red-800'
                           }`} data-testid={`difficulty-${question.id}`}>
-                            {t(`difficulty.${question.difficulty.toLowerCase()}`)}
+                            {getDifficultyText(question.difficulty)}
                           </span>
                           <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
                             question.masteryLevel === 'MASTERED' ? 'bg-blue-100 text-blue-800' :
                             question.masteryLevel === 'PARTIALLY_MASTERED' ? 'bg-orange-100 text-orange-800' :
                             'bg-gray-100 text-gray-800'
                           }`} data-testid={`mastery-${question.id}`}>
-                            {t(`mastery.${question.masteryLevel.toLowerCase().replace('_', '')}`)}
+                            {getMasteryText(question.masteryLevel)}
                           </span>
                         </div>
                         
                         <div className="flex items-center space-x-2">
                           <button
-                            onClick={() => setEditingQuestion(question)}
+                            onClick={() => {
+                              setEditingQuestion(question);
+                              initializeEditForm(question);
+                            }}
                             className="text-blue-600 hover:text-blue-800 text-sm font-medium"
                             data-testid={`edit-btn-${question.id}`}
                           >
-                            {t('actions.edit')}
+                            编辑
                           </button>
                           <button
                             onClick={() => handleDeleteQuestion(question.id)}
                             className="text-red-600 hover:text-red-800 text-sm font-medium"
                             data-testid={`delete-btn-${question.id}`}
                           >
-                            {t('actions.delete')}
+                            删除
                           </button>
                         </div>
                       </div>
@@ -596,14 +729,14 @@ export default function QuestionsPage() {
                       
                       <div className="mt-3 flex items-center space-x-4 text-sm text-gray-500">
                         <span data-testid={`added-date-${question.id}`}>
-                          {t('addedAt')}: {new Date(question.addedAt).toLocaleDateString()}
+                          添加时间: {new Date(question.addedAt).toLocaleDateString('zh-CN')}
                         </span>
                         <span data-testid={`review-count-${question.id}`}>
-                          {t('reviewCount')}: {question.reviewCount}
+                          复习次数: {question.reviewCount}
                         </span>
                         {question._count.bookmarks > 0 && (
                           <span data-testid={`bookmark-count-${question.id}`}>
-                            {t('bookmarkCount')}: {question._count.bookmarks}
+                            收藏数: {question._count.bookmarks}
                           </span>
                         )}
                       </div>
@@ -626,11 +759,11 @@ export default function QuestionsPage() {
               className="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
               data-testid="prev-page-btn"
             >
-              {t('pagination.previous')}
+              上一页
             </button>
             
             <span className="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700" data-testid="page-info">
-              {t('pagination.pageInfo', { current: pagination.page, total: pagination.totalPages })}
+              第 {pagination.page} 页 / 共 {pagination.totalPages} 页
             </span>
             
             <button
@@ -639,62 +772,377 @@ export default function QuestionsPage() {
               className="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
               data-testid="next-page-btn"
             >
-              {t('pagination.next')}
+              下一页
             </button>
           </nav>
         </div>
       )}
 
-      {/* Modals would go here - CreateQuestionModal, EditQuestionModal */}
+      {/* 创建错题模态框 */}
       {showCreateModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" data-testid="create-modal">
-          <div className="bg-white p-6 rounded-lg max-w-2xl w-full mx-4">
-            <h2 className="text-xl font-bold mb-4">{t('modals.createQuestion')}</h2>
-            {/* Create form would go here */}
-            <div className="flex justify-end space-x-3">
-              <button
-                onClick={() => setShowCreateModal(false)}
-                className="px-4 py-2 text-gray-600 border border-gray-300 rounded-md hover:bg-gray-50"
-                data-testid="cancel-create-btn"
-              >
-                {t('actions.cancel')}
-              </button>
-              <button
-                onClick={() => handleCreateQuestion({})}
-                className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
-                data-testid="confirm-create-btn"
-              >
-                {t('actions.create')}
-              </button>
-            </div>
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 overflow-y-auto" data-testid="create-modal">
+          <div className="bg-white p-6 rounded-lg max-w-4xl w-full mx-4 my-8">
+        <h2 className="text-xl font-bold mb-6">{t('questions.createQuestionModal')}</h2>
+            
+            <form onSubmit={(e) => { e.preventDefault(); handleCreateQuestion(); }} className="space-y-6">
+              {/* Question Title */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  错题标题（可选）
+                </label>
+                <input
+                  type="text"
+                  value={createFormData.title}
+                  onChange={(e) => setCreateFormData({ ...createFormData, title: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                  placeholder="请输入错题标题"
+                />
+              </div>
+
+              {/* Question Content */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  错题内容 *
+                </label>
+                <textarea
+                  value={createFormData.content}
+                  onChange={(e) => setCreateFormData({ ...createFormData, content: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                  rows={4}
+                  placeholder="请输入错题内容"
+                  required
+                />
+              </div>
+
+              {/* Your Answer and Correct Answer */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    您的答案 *
+                  </label>
+                  <textarea
+                    value={createFormData.myAnswer}
+                    onChange={(e) => setCreateFormData({ ...createFormData, myAnswer: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                    rows={3}
+                    placeholder="请输入您的答案"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    正确答案 *
+                  </label>
+                  <textarea
+                    value={createFormData.correctAnswer}
+                    onChange={(e) => setCreateFormData({ ...createFormData, correctAnswer: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                    rows={3}
+                    placeholder="请输入正确答案"
+                    required
+                  />
+                </div>
+              </div>
+
+              {/* Explanation */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  解析（可选）
+                </label>
+                <textarea
+                  value={createFormData.explanation}
+                  onChange={(e) => setCreateFormData({ ...createFormData, explanation: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                  rows={3}
+                  placeholder="请输入错题解析"
+                />
+              </div>
+
+              {/* Subject, Difficulty, Error Type */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    科目 *
+                  </label>
+                  <select
+                    value={createFormData.subjectId}
+                    onChange={(e) => setCreateFormData({ ...createFormData, subjectId: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                    required
+                  >
+                    <option value="">请选择科目</option>
+                    {subjects.map(subject => (
+                      <option key={subject.id} value={subject.id}>
+                        {subject.nameZh}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    难度
+                  </label>
+                  <select
+                    value={createFormData.difficulty}
+                    onChange={(e) => setCreateFormData({ ...createFormData, difficulty: e.target.value as 'EASY' | 'MEDIUM' | 'HARD' })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                  >
+                    <option value="EASY">简单</option>
+                    <option value="MEDIUM">中等</option>
+                    <option value="HARD">困难</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    错误类型
+                  </label>
+                  <select
+                    value={createFormData.errorType}
+                    onChange={(e) => setCreateFormData({ ...createFormData, errorType: e.target.value as 'CALCULATION' | 'CONCEPTUAL' | 'CARELESS' | 'METHODOLOGICAL' | 'KNOWLEDGE' | 'OTHER' })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                  >
+                    <option value="CALCULATION">计算错误</option>
+                    <option value="CONCEPTUAL">概念错误</option>
+                    <option value="CARELESS">粗心错误</option>
+                    <option value="METHODOLOGICAL">方法错误</option>
+                    <option value="KNOWLEDGE">知识点错误</option>
+                    <option value="OTHER">其他</option>
+                  </select>
+                </div>
+              </div>
+
+              {/* Language Type */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  语言类型
+                </label>
+                <select
+                  value={createFormData.languageType}
+                  onChange={(e) => setCreateFormData({ ...createFormData, languageType: e.target.value as 'CHINESE' | 'ENGLISH' | 'BILINGUAL' })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                >
+                  <option value="CHINESE">中文</option>
+                  <option value="ENGLISH">英文</option>
+                  <option value="BILINGUAL">中英文</option>
+                </select>
+              </div>
+
+              {/* Submit Button */}
+              <div className="flex justify-end space-x-3 pt-4 border-t">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowCreateModal(false);
+                    resetCreateForm();
+                  }}
+                  className="px-4 py-2 text-gray-600 border border-gray-300 rounded-md hover:bg-gray-50"
+                  data-testid="cancel-create-btn"
+                >
+                  取消
+                </button>
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50"
+                  data-testid="confirm-create-btn"
+                >
+                  {loading ? '创建中...' : '创建'}
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}
 
+      {/* 编辑错题模态框 */}
       {editingQuestion && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" data-testid="edit-modal">
-          <div className="bg-white p-6 rounded-lg max-w-2xl w-full mx-4">
-            <h2 className="text-xl font-bold mb-4">{t('modals.editQuestion')}</h2>
-            {/* Edit form would go here */}
-            <div className="flex justify-end space-x-3">
-              <button
-                onClick={() => setEditingQuestion(null)}
-                className="px-4 py-2 text-gray-600 border border-gray-300 rounded-md hover:bg-gray-50"
-                data-testid="cancel-edit-btn"
-              >
-                {t('actions.cancel')}
-              </button>
-              <button
-                onClick={() => handleUpdateQuestion(editingQuestion.id, {})}
-                className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
-                data-testid="confirm-edit-btn"
-              >
-                {t('actions.save')}
-              </button>
-            </div>
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 overflow-y-auto" data-testid="edit-modal">
+          <div className="bg-white p-6 rounded-lg max-w-4xl w-full mx-4 my-8">
+        <h2 className="text-xl font-bold mb-6">{t('questions.editQuestionModal')}</h2>
+            
+            <form onSubmit={(e) => { e.preventDefault(); handleUpdateQuestion(); }} className="space-y-6">
+              {/* Question Title */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  错题标题（可选）
+                </label>
+                <input
+                  type="text"
+                  value={editFormData.title}
+                  onChange={(e) => setEditFormData({ ...editFormData, title: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                  placeholder="请输入错题标题"
+                />
+              </div>
+
+              {/* Question Content */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  错题内容 *
+                </label>
+                <textarea
+                  value={editFormData.content}
+                  onChange={(e) => setEditFormData({ ...editFormData, content: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                  rows={4}
+                  placeholder="请输入错题内容"
+                  required
+                />
+              </div>
+
+              {/* Your Answer and Correct Answer */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    您的答案 *
+                  </label>
+                  <textarea
+                    value={editFormData.myAnswer}
+                    onChange={(e) => setEditFormData({ ...editFormData, myAnswer: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                    rows={3}
+                    placeholder="请输入您的答案"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    正确答案 *
+                  </label>
+                  <textarea
+                    value={editFormData.correctAnswer}
+                    onChange={(e) => setEditFormData({ ...editFormData, correctAnswer: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                    rows={3}
+                    placeholder="请输入正确答案"
+                    required
+                  />
+                </div>
+              </div>
+
+              {/* Explanation */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  解析（可选）
+                </label>
+                <textarea
+                  value={editFormData.explanation}
+                  onChange={(e) => setEditFormData({ ...editFormData, explanation: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                  rows={3}
+                  placeholder="请输入错题解析"
+                />
+              </div>
+
+              {/* Subject, Difficulty, Error Type, Mastery Level */}
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    科目 *
+                  </label>
+                  <select
+                    value={editFormData.subjectId}
+                    onChange={(e) => setEditFormData({ ...editFormData, subjectId: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                    required
+                  >
+                    <option value="">请选择科目</option>
+                    {subjects.map(subject => (
+                      <option key={subject.id} value={subject.id}>
+                        {subject.nameZh}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    难度
+                  </label>
+                  <select
+                    value={editFormData.difficulty}
+                    onChange={(e) => setEditFormData({ ...editFormData, difficulty: e.target.value as 'EASY' | 'MEDIUM' | 'HARD' })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                  >
+                    <option value="EASY">简单</option>
+                    <option value="MEDIUM">中等</option>
+                    <option value="HARD">困难</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    错误类型
+                  </label>
+                  <select
+                    value={editFormData.errorType}
+                    onChange={(e) => setEditFormData({ ...editFormData, errorType: e.target.value as 'CALCULATION' | 'CONCEPTUAL' | 'CARELESS' | 'METHODOLOGICAL' | 'KNOWLEDGE' | 'OTHER' })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                  >
+                    <option value="CALCULATION">计算错误</option>
+                    <option value="CONCEPTUAL">概念错误</option>
+                    <option value="CARELESS">粗心错误</option>
+                    <option value="METHODOLOGICAL">方法错误</option>
+                    <option value="KNOWLEDGE">知识点错误</option>
+                    <option value="OTHER">其他</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    掌握程度
+                  </label>
+                  <select
+                    value={editFormData.masteryLevel}
+                    onChange={(e) => setEditFormData({ ...editFormData, masteryLevel: e.target.value as 'NOT_MASTERED' | 'PARTIALLY_MASTERED' | 'MASTERED' })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                  >
+                    <option value="NOT_MASTERED">未掌握</option>
+                    <option value="PARTIALLY_MASTERED">部分掌握</option>
+                    <option value="MASTERED">已掌握</option>
+                  </select>
+                </div>
+              </div>
+
+              {/* Language Type */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  语言类型
+                </label>
+                <select
+                  value={editFormData.languageType}
+                  onChange={(e) => setEditFormData({ ...editFormData, languageType: e.target.value as 'CHINESE' | 'ENGLISH' | 'BILINGUAL' })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                >
+                  <option value="CHINESE">中文</option>
+                  <option value="ENGLISH">英文</option>
+                  <option value="BILINGUAL">中英文</option>
+                </select>
+              </div>
+
+              {/* Submit Button */}
+              <div className="flex justify-end space-x-3 pt-4 border-t">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setEditingQuestion(null);
+                    resetEditForm();
+                  }}
+                  className="px-4 py-2 text-gray-600 border border-gray-300 rounded-md hover:bg-gray-50"
+                  data-testid="cancel-edit-btn"
+                >
+                  取消
+                </button>
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50"
+                  data-testid="confirm-edit-btn"
+                >
+                  {loading ? '保存中...' : '保存'}
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}
-    </div>
+    </AppLayout>
   );
 }

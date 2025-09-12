@@ -1,10 +1,13 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../stores/authStore';
 import { subjectsAPI, Subject } from '../../lib/api';
+import AppLayout from '../../components/layout/AppLayout';
 
 export default function SubjectsPage() {
+  const { t } = useTranslation();
   const { isAuthenticated, user } = useAuth();
   const [subjects, setSubjects] = useState<Subject[]>([]);
   const [loading, setLoading] = useState(true);
@@ -20,7 +23,7 @@ export default function SubjectsPage() {
     order: 0
   });
 
-  // 获取科目列表
+  // Get subjects list
   const fetchSubjects = async () => {
     try {
       setLoading(true);
@@ -42,13 +45,13 @@ export default function SubjectsPage() {
     fetchSubjects();
   }, []);
 
-  // 处理表单提交
+  // Handle form submission
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     try {
       if (editingSubject) {
-        // 更新科目
+        // Update subject
         const response = await subjectsAPI.updateSubject(editingSubject.id, formData);
         if (response.success) {
           await fetchSubjects();
@@ -56,26 +59,26 @@ export default function SubjectsPage() {
           setEditingSubject(null);
           resetForm();
         } else {
-          setError(response.error || '更新科目失败');
+        setError(response.error || t('subjects.errors.updateFailed'));
         }
       } else {
-        // 创建科目
+        // Create subject
         const response = await subjectsAPI.createSubject(formData);
         if (response.success) {
           await fetchSubjects();
           setIsModalOpen(false);
           resetForm();
         } else {
-          setError(response.error || '创建科目失败');
+        setError(response.error || t('subjects.errors.createFailed'));
         }
       }
     } catch (error) {
-      console.error('提交表单错误:', error);
-      setError('操作失败，请重试');
+      console.error('Submit form error:', error);
+      setError(t('subjects.errors.submitError'));
     }
   };
 
-  // 重置表单
+  // Reset form
   const resetForm = () => {
     setFormData({
       code: '',
@@ -87,7 +90,7 @@ export default function SubjectsPage() {
     });
   };
 
-  // 打开编辑模态框
+  // Open edit modal
   const openEditModal = (subject: Subject) => {
     setEditingSubject(subject);
     setFormData({
@@ -101,60 +104,26 @@ export default function SubjectsPage() {
     setIsModalOpen(true);
   };
 
-  // 删除科目
+  // Delete subject
   const handleDelete = async (id: string) => {
-    if (!confirm('确定要删除这个科目吗？')) return;
+    if (!confirm(t('subjects.confirm.delete'))) return;
 
     try {
       const response = await subjectsAPI.deleteSubject(id);
       if (response.success) {
         await fetchSubjects();
       } else {
-        setError(response.error || '删除科目失败');
+        setError(response.error || t('subjects.errors.deleteFailed'));
       }
     } catch (error) {
-      console.error('删除科目错误:', error);
-      setError('删除科目失败');
+      console.error('Delete subject error:', error);
+      setError(t('subjects.errors.deleteFailed'));
     }
   };
 
-  // 如果未认证，重定向到登录页
-  if (!isAuthenticated) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-100">
-        <div className="text-center">
-          <p className="text-gray-600 mb-4">请先登录以访问科目管理</p>
-          <a href="/auth/login" className="text-blue-600 hover:text-blue-800">
-            前往登录
-          </a>
-        </div>
-      </div>
-    );
-  }
-
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* 头部导航 */}
-      <nav className="bg-white shadow-sm border-b">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-4">
-            <div className="flex items-center space-x-4">
-              <a href="/dashboard" className="text-gray-500 hover:text-gray-700">
-                ← 返回主页
-              </a>
-              <h1 className="text-xl font-semibold text-gray-900">科目管理</h1>
-            </div>
-            <div className="flex items-center space-x-4">
-              <span className="text-sm text-gray-600">
-                欢迎, {user?.name}
-              </span>
-            </div>
-          </div>
-        </div>
-      </nav>
-
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* 错误提示 */}
+    <AppLayout title={t('subjects.title')} description={t('subjects.description')}>
+        {/* Error Message */}
         {error && (
           <div className="mb-6 p-4 bg-red-100 border border-red-400 text-red-700 rounded">
             {error}
@@ -167,9 +136,9 @@ export default function SubjectsPage() {
           </div>
         )}
 
-        {/* 操作按钮 */}
+        {/* Action Buttons */}
         <div className="mb-6 flex justify-between items-center">
-          <h2 className="text-2xl font-bold text-gray-900">科目列表</h2>
+          <h2 className="text-2xl font-bold text-gray-900">{t('subjects.list')}</h2>
           <button
             onClick={() => {
               resetForm();
@@ -178,15 +147,15 @@ export default function SubjectsPage() {
             }}
             className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md shadow-sm"
           >
-            添加科目
+            {t('subjects.add')}
           </button>
         </div>
 
-        {/* 科目列表 */}
+        {/* Subjects List */}
         {loading ? (
           <div className="flex justify-center items-center py-12">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-            <span className="ml-2 text-gray-600">加载中...</span>
+            <span className="ml-2 text-gray-600">{t('common.actions.loading')}</span>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -204,22 +173,22 @@ export default function SubjectsPage() {
                 
                 <div className="space-y-2 mb-4">
                   <p className="text-sm text-gray-600">
-                    <span className="font-medium">英文名:</span> {subject.nameEn}
+                    <span className="font-medium">{t('subjects.fields.englishName')}</span> {subject.nameEn}
                   </p>
                   <p className="text-sm text-gray-600">
-                    <span className="font-medium">代码:</span> {subject.code}
+                    <span className="font-medium">{t('subjects.fields.code')}</span> {subject.code}
                   </p>
                   {subject.description && (
                     <p className="text-sm text-gray-600">
-                      <span className="font-medium">描述:</span> {subject.description}
+                      <span className="font-medium">{t('subjects.fields.description')}</span> {subject.description}
                     </p>
                   )}
                   <p className="text-sm text-gray-600">
-                    <span className="font-medium">排序:</span> {subject.order}
+                    <span className="font-medium">{t('subjects.fields.order')}</span> {subject.order}
                   </p>
                   {subject._count && (
                     <p className="text-sm text-gray-600">
-                      <span className="font-medium">错题数:</span> {subject._count.questions}
+                      <span className="font-medium">{t('subjects.fields.questionCount')}</span> {subject._count.questions}
                     </p>
                   )}
                 </div>
@@ -229,7 +198,7 @@ export default function SubjectsPage() {
                     onClick={() => openEditModal(subject)}
                     className="flex-1 px-3 py-2 text-sm bg-blue-50 text-blue-600 hover:bg-blue-100 rounded-md"
                   >
-                    编辑
+                    {t('subjects.edit')}
                   </button>
                   <button
                     onClick={() => handleDelete(subject.id)}
@@ -240,7 +209,7 @@ export default function SubjectsPage() {
                         : 'bg-red-50 text-red-600 hover:bg-red-100'
                     }`}
                   >
-                    删除
+                    {t('subjects.delete')}
                   </button>
                 </div>
               </div>
@@ -248,12 +217,12 @@ export default function SubjectsPage() {
           </div>
         )}
 
-        {/* 空状态 */}
+        {/* Empty State */}
         {!loading && subjects.length === 0 && (
           <div className="text-center py-12">
             <div className="text-gray-400 text-6xl mb-4">📚</div>
-            <h3 className="text-lg font-medium text-gray-900 mb-2">暂无科目</h3>
-            <p className="text-gray-600 mb-4">开始创建您的第一个科目吧！</p>
+            <h3 className="text-lg font-medium text-gray-900 mb-2">{t('subjects.empty.title')}</h3>
+            <p className="text-gray-600 mb-4">{t('subjects.empty.description')}</p>
             <button
               onClick={() => {
                 resetForm();
@@ -262,82 +231,81 @@ export default function SubjectsPage() {
               }}
               className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md"
             >
-              添加科目
+              {t('subjects.empty.action')}
             </button>
           </div>
         )}
-      </main>
 
-      {/* 添加/编辑科目模态框 */}
+      {/* Add/Edit Subject Modal */}
       {isModalOpen && (
         <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full flex items-center justify-center">
           <div className="bg-white p-8 rounded-lg shadow-xl max-w-md w-full mx-4">
             <div className="mb-6">
               <h3 className="text-lg font-semibold text-gray-900">
-                {editingSubject ? '编辑科目' : '添加科目'}
+                {editingSubject ? t('subjects.edit') : t('subjects.add')}
               </h3>
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  科目代码 *
+                  {t('subjects.form.code')} *
                 </label>
                 <input
                   type="text"
                   value={formData.code}
                   onChange={(e) => setFormData({ ...formData, code: e.target.value })}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  placeholder="如: math, english"
+                  placeholder={t('subjects.form.codePlaceholder')}
                   required
                 />
               </div>
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  中文名称 *
+                  {t('subjects.form.nameZh')} *
                 </label>
                 <input
                   type="text"
                   value={formData.nameZh}
                   onChange={(e) => setFormData({ ...formData, nameZh: e.target.value })}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  placeholder="如: 数学"
+                  placeholder={t('subjects.form.nameZhPlaceholder')}
                   required
                 />
               </div>
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  英文名称 *
+                  {t('subjects.form.nameEn')} *
                 </label>
                 <input
                   type="text"
                   value={formData.nameEn}
                   onChange={(e) => setFormData({ ...formData, nameEn: e.target.value })}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  placeholder="如: Mathematics"
+                  placeholder={t('subjects.form.nameEnPlaceholder')}
                   required
                 />
               </div>
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  描述
+                  {t('subjects.form.description')}
                 </label>
                 <textarea
                   value={formData.description}
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   rows={3}
-                  placeholder="科目描述（可选）"
+                  placeholder={t('subjects.form.descriptionPlaceholder')}
                 />
               </div>
 
               <div className="flex space-x-4">
                 <div className="flex-1">
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    颜色
+                    {t('subjects.form.color')}
                   </label>
                   <input
                     type="color"
@@ -348,7 +316,7 @@ export default function SubjectsPage() {
                 </div>
                 <div className="flex-1">
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    排序
+                    {t('subjects.form.order')}
                   </label>
                   <input
                     type="number"
@@ -370,19 +338,19 @@ export default function SubjectsPage() {
                   }}
                   className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50"
                 >
-                  取消
+                  {t('subjects.form.cancel')}
                 </button>
                 <button
                   type="submit"
                   className="flex-1 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md"
                 >
-                  {editingSubject ? '更新' : '创建'}
+                  {editingSubject ? t('subjects.form.update') : t('subjects.form.create')}
                 </button>
               </div>
             </form>
           </div>
         </div>
       )}
-    </div>
+    </AppLayout>
   );
 }

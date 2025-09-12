@@ -17,7 +17,7 @@ const mockAxiosInstance = {
   },
 };
 
-mockedAxios.create.mockReturnValue(mockAxiosInstance as any);
+mockedAxios.create.mockReturnValue(mockAxiosInstance as unknown as typeof mockAxiosInstance);
 
 describe('API Configuration', () => {
   beforeEach(() => {

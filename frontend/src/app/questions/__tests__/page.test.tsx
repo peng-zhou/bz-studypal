@@ -1,7 +1,7 @@
 import React from 'react';
 import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { useRouter } from 'next/navigation';
-import { useTranslation } from 'react-i18next';
 import QuestionsPage from '../page';
 import { useAuthStore } from '@/stores/authStore';
 import { questionsAPI, subjectsAPI } from '@/lib/api';
@@ -9,10 +9,6 @@ import { questionsAPI, subjectsAPI } from '@/lib/api';
 // Mock dependencies
 jest.mock('next/navigation', () => ({
   useRouter: jest.fn(),
-}));
-
-jest.mock('react-i18next', () => ({
-  useTranslation: jest.fn(),
 }));
 
 jest.mock('@/stores/authStore', () => ({
@@ -40,59 +36,11 @@ const mockRouter = {
   prefetch: jest.fn(),
 };
 
-const mockT = (key: string, options?: any) => {
-  const translations: Record<string, string> = {
-    'title': 'Questions Management',
-    'description': 'Manage your wrong questions',
-    'stats.totalQuestions': 'Total Questions',
-    'stats.thisWeek': 'This Week',
-    'stats.notMastered': 'Not Mastered',
-    'stats.mastered': 'Mastered',
-    'filters.search': 'Search',
-    'filters.searchPlaceholder': 'Search questions...',
-    'filters.subject': 'Subject',
-    'filters.allSubjects': 'All Subjects',
-    'filters.difficulty': 'Difficulty',
-    'filters.allDifficulties': 'All Difficulties',
-    'filters.mastery': 'Mastery',
-    'filters.allMastery': 'All Mastery Levels',
-    'filters.sortBy': 'Sort By',
-    'filters.sortOrder': 'Sort Order',
-    'difficulty.easy': 'Easy',
-    'difficulty.medium': 'Medium',
-    'difficulty.hard': 'Hard',
-    'mastery.notmastered': 'Not Mastered',
-    'mastery.partiallymastered': 'Partially Mastered',
-    'mastery.mastered': 'Mastered',
-    'sort.addedAt': 'Added Date',
-    'sort.lastReviewed': 'Last Reviewed',
-    'sort.reviewCount': 'Review Count',
-    'sort.difficulty': 'Difficulty',
-    'sort.descending': 'Descending',
-    'sort.ascending': 'Ascending',
-    'actions.createQuestion': 'Create Question',
-    'actions.deleteSelected': `Delete Selected (${options?.count || 0})`,
-    'actions.edit': 'Edit',
-    'actions.delete': 'Delete',
-    'actions.cancel': 'Cancel',
-    'actions.create': 'Create',
-    'actions.save': 'Save',
-    'pagination.showing': `Showing ${options?.start || 1}-${options?.end || 0} of ${options?.total || 0}`,
-    'pagination.previous': 'Previous',
-    'pagination.next': 'Next',
-    'pagination.pageInfo': `Page ${options?.current || 1} of ${options?.total || 1}`,
-    'selectAll': 'Select All',
-    'emptyState': 'No questions found',
-    'addedAt': 'Added',
-    'reviewCount': 'Reviews',
-    'bookmarkCount': 'Bookmarks',
-    'confirmDelete': 'Are you sure you want to delete this question?',
-    'confirmDeleteSelected': `Are you sure you want to delete ${options?.count || 0} questions?`,
-    'modals.createQuestion': 'Create New Question',
-    'modals.editQuestion': 'Edit Question'
-  };
-  return translations[key] || key;
-};
+// Mock data helpers
+const mockConfirm = jest.fn();
+Object.defineProperty(window, 'confirm', {
+  value: mockConfirm,
+});
 
 const mockSubjects = [
   {
@@ -195,9 +143,15 @@ const mockPagination = {
   hasPrevPage: false
 };
 
+// Mock AppLayout component
+jest.mock('../../../components/layout/AppLayout', () => {
+  return function MockAppLayout({ children }: { children: React.ReactNode }) {
+    return <div data-testid="app-layout">{children}</div>;
+  };
+});
+
 describe('QuestionsPage', () => {
   const mockUseRouter = useRouter as jest.MockedFunction<typeof useRouter>;
-  const mockUseTranslation = useTranslation as jest.MockedFunction<typeof useTranslation>;
   const mockUseAuthStore = useAuthStore as jest.MockedFunction<typeof useAuthStore>;
   const mockQuestionsAPI = questionsAPI as jest.Mocked<typeof questionsAPI>;
   const mockSubjectsAPI = subjectsAPI as jest.Mocked<typeof subjectsAPI>;

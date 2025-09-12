@@ -1,19 +1,19 @@
 import axios from 'axios';
 
-// 创建axios实例
+// Create axios instance
 export const api = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000',
   timeout: 10000,
   headers: {
     'Content-Type': 'application/json',
   },
-  withCredentials: true, // 支持cookie认证
+  withCredentials: true, // Support cookie authentication
 });
 
-// 请求拦截器 - 添加认证token
+// Request interceptor - Add authentication token
 api.interceptors.request.use(
   (config) => {
-    // 从localStorage获取token
+    // Get token from localStorage
     if (typeof window !== 'undefined') {
       const token = localStorage.getItem('accessToken');
       if (token) {
@@ -27,7 +27,7 @@ api.interceptors.request.use(
   }
 );
 
-// 响应拦截器 - 处理认证错误
+// Response interceptor - Handle authentication errors
 api.interceptors.response.use(
   (response) => {
     return response;
@@ -35,23 +35,23 @@ api.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config;
 
-    // 如果是401错误且不是重试请求
+    // If it's a 401 error and not a retry request
     if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
 
       try {
-        // 尝试刷新token
+        // Try to refresh token
         const refreshResponse = await api.post('/api/auth/refresh');
         const { accessToken } = refreshResponse.data.data.tokens;
         
-        // 更新localStorage中的token
+        // Update token in localStorage
         localStorage.setItem('accessToken', accessToken);
         
-        // 重新发送原请求
+        // Resend original request
         originalRequest.headers.Authorization = `Bearer ${accessToken}`;
         return api(originalRequest);
       } catch (refreshError) {
-        // 刷新失败，清除认证状态
+        // Refresh failed, clear authentication state
         if (typeof window !== 'undefined') {
           localStorage.removeItem('accessToken');
           localStorage.removeItem('user');
@@ -65,143 +65,143 @@ api.interceptors.response.use(
   }
 );
 
-// 认证相关API
+// Authentication related API
 export const authAPI = {
-  // 用户注册
+  // User registration
   register: async (data: RegisterData) => {
     const response = await api.post('/api/auth/register', data);
     return response.data;
   },
 
-  // 用户登录
+  // User login
   login: async (data: LoginData) => {
     const response = await api.post('/api/auth/login', data);
     return response.data;
   },
 
-  // Google OAuth登录
+  // Google OAuth login
   googleLogin: async (idToken: string) => {
     const response = await api.post('/api/auth/google', { idToken });
     return response.data;
   },
 
-  // 获取用户资料
+  // Get user profile
   getProfile: async () => {
     const response = await api.get('/api/auth/profile');
     return response.data;
   },
 
-  // 登出
+  // Logout
   logout: async () => {
     const response = await api.post('/api/auth/logout');
     return response.data;
   },
 
-  // 刷新token
+  // Refresh token
   refreshToken: async () => {
     const response = await api.post('/api/auth/refresh');
     return response.data;
   },
 
-  // 检查认证状态
+  // Check authentication status
   checkAuthStatus: async () => {
     const response = await api.get('/api/auth/status');
     return response.data;
   },
 
-  // 获取Google OAuth配置
+  // Get Google OAuth configuration
   getGoogleConfig: async () => {
     const response = await api.get('/api/auth/google/config');
     return response.data;
   },
 };
 
-// 科目管理API
+// Subject management API
 export const subjectsAPI = {
-  // 获取所有科目
+  // Get all subjects
   getSubjects: async () => {
     const response = await api.get('/api/v1/subjects');
     return response.data;
   },
 
-  // 根据ID获取科目
+  // Get subject by ID
   getSubjectById: async (id: string) => {
     const response = await api.get(`/api/v1/subjects/${id}`);
     return response.data;
   },
 
-  // 创建科目
+  // Create subject
   createSubject: async (data: CreateSubjectData) => {
     const response = await api.post('/api/v1/subjects', data);
     return response.data;
   },
 
-  // 更新科目
+  // Update subject
   updateSubject: async (id: string, data: UpdateSubjectData) => {
     const response = await api.put(`/api/v1/subjects/${id}`, data);
     return response.data;
   },
 
-  // 删除科目
+  // Delete subject
   deleteSubject: async (id: string) => {
     const response = await api.delete(`/api/v1/subjects/${id}`);
     return response.data;
   },
 
-  // 更新科目排序
+  // Update subjects order
   updateSubjectsOrder: async (data: SubjectsOrderData) => {
     const response = await api.post('/api/v1/subjects/reorder', data);
     return response.data;
   },
 };
 
-// 错题管理API
+// Question management API
 export const questionsAPI = {
-  // 获取错题列表
+  // Get questions list
   getQuestions: async (query?: string) => {
     const url = query ? `/api/v1/questions?${query}` : '/api/v1/questions';
     const response = await api.get(url);
     return response.data;
   },
 
-  // 根据ID获取错题
+  // Get question by ID
   getQuestionById: async (id: string) => {
     const response = await api.get(`/api/v1/questions/${id}`);
     return response.data;
   },
 
-  // 创建错题
+  // Create question
   createQuestion: async (data: CreateQuestionData) => {
     const response = await api.post('/api/v1/questions', data);
     return response.data;
   },
 
-  // 更新错题
+  // Update question
   updateQuestion: async (id: string, data: UpdateQuestionData) => {
     const response = await api.put(`/api/v1/questions/${id}`, data);
     return response.data;
   },
 
-  // 删除错题
+  // Delete question
   deleteQuestion: async (id: string) => {
     const response = await api.delete(`/api/v1/questions/${id}`);
     return response.data;
   },
 
-  // 批量删除错题
+  // Batch delete questions
   batchDeleteQuestions: async (questionIds: string[]) => {
     const response = await api.post('/api/v1/questions/batch/delete', { questionIds });
     return response.data;
   },
 
-  // 获取错题统计
+  // Get question statistics
   getQuestionStats: async () => {
     const response = await api.get('/api/v1/questions/stats');
     return response.data;
   },
 };
 
-// 类型定义
+// Type definitions
 export interface LoginData {
   email: string;
   password: string;
@@ -240,10 +240,10 @@ export interface ApiError {
   success: false;
   error: string;
   code?: string;
-  details?: any;
+  details?: unknown;
 }
 
-// 科目相关接口定义
+// Subject related interface definitions
 export interface Subject {
   id: string;
   code: string;
@@ -282,7 +282,7 @@ export interface SubjectsOrderData {
   }>;
 }
 
-// 错题相关接口定义
+// Question related interface definitions
 export interface Question {
   id: string;
   title?: string;

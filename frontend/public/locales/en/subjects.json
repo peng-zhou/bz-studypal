@@ -1,0 +1,47 @@
+{
+  "title": "Subject Management",
+  "description": "Manage your subjects",
+  "list": "Subject List",
+  "add": "Add Subject",
+  "edit": "Edit Subject",
+  "delete": "Delete",
+  "confirm": {
+    "delete": "Are you sure you want to delete this subject?"
+  },
+  "form": {
+    "code": "Subject Code",
+    "codeRequired": "Subject Code is required",
+    "codePlaceholder": "e.g., math, english",
+    "nameZh": "Chinese Name",
+    "nameZhRequired": "Chinese Name is required",
+    "nameZhPlaceholder": "e.g., 数学",
+    "nameEn": "English Name",
+    "nameEnRequired": "English Name is required",
+    "nameEnPlaceholder": "e.g., Mathematics",
+    "description": "Description",
+    "descriptionPlaceholder": "Subject description (optional)",
+    "color": "Color",
+    "order": "Order",
+    "create": "Create",
+    "update": "Update",
+    "cancel": "Cancel"
+  },
+  "fields": {
+    "englishName": "English Name:",
+    "code": "Code:",
+    "description": "Description:",
+    "order": "Order:",
+    "questionCount": "Question Count:"
+  },
+  "empty": {
+    "title": "No Subjects",
+    "description": "Start by creating your first subject!",
+    "action": "Add Subject"
+  },
+  "errors": {
+    "updateFailed": "Failed to update subject",
+    "createFailed": "Failed to create subject",
+    "deleteFailed": "Failed to delete subject",
+    "submitError": "Operation failed, please try again"
+  }
+}

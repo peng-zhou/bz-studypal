@@ -1,201 +1,201 @@
-# BZ StudyPal - 项目状态报告
+# BZ StudyPal - Project Status Report
 
-## 📋 项目概览
-**BZ StudyPal** 是一个双语版MVP错题管理与复习系统，帮助用户高效管理和复习错题，提升学习效果。
+## 📋 Project Overview
+**BZ StudyPal** is a bilingual MVP mistake question management and review system that helps users efficiently manage and review mistake questions to improve learning outcomes.
 
-## ✅ 已完成功能
+## ✅ Completed Features
 
-### 🎯 后端 (Express + Prisma + SQLite)
-- [x] **认证系统**
-  - 用户注册/登录 (JWT + bcrypt)
-  - Google OAuth 2.0 登录支持
-  - Token刷新机制
-  - 受保护的路由中间件
-  - 用户会话管理
+### 🎯 Backend (Express + Prisma + SQLite)
+- [x] **Authentication System**
+  - User registration/login (JWT + bcrypt)
+  - Google OAuth 2.0 login support
+  - Token refresh mechanism
+  - Protected route middleware
+  - User session management
 
-- [x] **数据库设计**
-  - 完整的Prisma模式设计
-  - 用户管理 (支持多角色: STUDENT/TEACHER/PARENT/ADMIN)
-  - 错题管理 (Questions, 支持图片、标签、分类)
-  - 科目分类 (Subjects)
-  - 收藏系统 (Bookmarks, BookmarkFolders)
-  - 复习记录 (Reviews)
-  - 系统配置管理
+- [x] **Database Design**
+  - Complete Prisma schema design
+  - User management (supports multiple roles: STUDENT/TEACHER/PARENT/ADMIN)
+  - Mistake question management (Questions, supports images, tags, categorization)
+  - Subject categorization (Subjects)
+  - Bookmark system (Bookmarks, BookmarkFolders)
+  - Review records (Reviews)
+  - System configuration management
 
-- [x] **性能优化**
-  - PrismaClient单例模式
-  - 内存缓存优化
-  - bcrypt工作因子优化 (开发环境)
-  - 非阻塞健康检查
-  - 响应超时保护
+- [x] **Performance Optimization**
+  - PrismaClient singleton pattern
+  - Memory cache optimization
+  - bcrypt work factor optimization (development environment)
+  - Non-blocking health checks
+  - Response timeout protection
 
-- [x] **API端点**
-  - `POST /api/auth/register` - 用户注册
-  - `POST /api/auth/login` - 用户登录
+- [x] **API Endpoints**
+  - `POST /api/auth/register` - User registration
+  - `POST /api/auth/login` - User login
   - `POST /api/auth/google` - Google OAuth
-  - `POST /api/auth/refresh` - 刷新token
-  - `POST /api/auth/logout` - 用户登出
-  - `GET /api/auth/profile` - 获取用户信息
-  - `GET /api/auth/status` - 认证状态检查
-  - `GET /health` - 健康检查
+  - `POST /api/auth/refresh` - Token refresh
+  - `POST /api/auth/logout` - User logout
+  - `GET /api/auth/profile` - Get user information
+  - `GET /api/auth/status` - Authentication status check
+  - `GET /health` - Health check
 
-### 🎨 前端 (Next.js 15 + Tailwind CSS + Zustand)
-- [x] **认证UI**
-  - 精美的主页设计 (渐变背景 + 卡片布局)
-  - 登录页面 (表单验证、密码显示切换)
-  - 注册页面 (包含语言选择)
-  - Dashboard仪表板 (用户信息显示)
+### 🎨 Frontend (Next.js 15 + Tailwind CSS + Zustand)
+- [x] **Authentication UI**
+  - Beautiful homepage design (gradient background + card layout)
+  - Login page (form validation, password visibility toggle)
+  - Registration page (includes language selection)
+  - Dashboard (user information display)
 
-- [x] **状态管理**
-  - Zustand认证store
-  - JWT token管理
-  - 持久化用户状态
-  - 自动token刷新
+- [x] **State Management**
+  - Zustand authentication store
+  - JWT token management
+  - Persistent user state
+  - Automatic token refresh
 
-- [x] **路由保护**
-  - 认证状态检查
-  - 自动重定向
-  - 加载状态处理
+- [x] **Route Protection**
+  - Authentication status checking
+  - Automatic redirection
+  - Loading state handling
 
-- [x] **API集成**
-  - Axios HTTP客户端
-  - 请求/响应拦截器
-  - 自动token注入
-  - 错误处理
+- [x] **API Integration**
+  - Axios HTTP client
+  - Request/response interceptors
+  - Automatic token injection
+  - Error handling
 
-### 🧪 测试与工具
-- [x] **后端测试**
-  - 自动化bash测试脚本
-  - Postman API测试集合
-  - Newman自动化测试
+### 🧪 Testing & Tools
+- [x] **Backend Testing**
+  - Automated bash testing scripts
+  - Postman API test collections
+  - Newman automated testing
 
-- [x] **开发工具**
-  - 完整的TypeScript支持
-  - ESLint + Prettier配置
-  - 开发环境热重载
-  - 错误日志记录
+- [x] **Development Tools**
+  - Complete TypeScript support
+  - ESLint + Prettier configuration
+  - Development environment hot reload
+  - Error logging
 
-## 🚀 当前运行状态
+## 🚀 Current Running Status
 
-### 服务器状态
-- **后端**: http://localhost:8000 ✅ 运行中
-- **前端**: http://localhost:3001 ✅ 运行中
-- **数据库**: SQLite ✅ 连接正常
+### Server Status
+- **Backend**: http://localhost:8000 ✅ Running
+- **Frontend**: http://localhost:3001 ✅ Running
+- **Database**: SQLite ✅ Connected
 
-### 性能指标
-- **平均响应时间**: ~25-50ms
-- **数据库连接**: 稳定 (300ms超时保护)
-- **内存使用**: 优化 (PrismaClient单例)
+### Performance Metrics
+- **Average Response Time**: ~25-50ms
+- **Database Connection**: Stable (300ms timeout protection)
+- **Memory Usage**: Optimized (PrismaClient singleton)
 
-## 🧪 测试结果
+## 🧪 Test Results
 
-### API测试 ✅
+### API Testing ✅
 ```bash
 ./test-auth-flow.sh
 ```
-- 健康检查: ✅ 通过
-- 认证状态: ✅ 配置完整
-- 用户注册: ✅ 成功
-- 受保护路由: ✅ Token验证正常
+- Health Check: ✅ Passed
+- Authentication Status: ✅ Configuration Complete
+- User Registration: ✅ Successful
+- Protected Routes: ✅ Token Validation Normal
 
-### 前端测试 ✅
-从开发服务器日志可以看出用户成功完成了：
-1. 用户注册 → Dashboard
-2. 登出 → 主页
-3. 登录 → Dashboard
-4. 页面间正常导航
+### Frontend Testing ✅
+From development server logs, users successfully completed:
+1. User Registration → Dashboard
+2. Logout → Homepage
+3. Login → Dashboard
+4. Normal navigation between pages
 
-## 📱 用户界面
+## 📱 User Interface
 
-### 主页 (/)
-- 🎓 BZ StudyPal品牌展示
-- 功能介绍卡片 (错题管理、学习统计、复习计划)
-- 登录/注册按钮
-- 响应式设计 + 渐变背景
+### Homepage (/)
+- 🎓 BZ StudyPal brand showcase
+- Feature introduction cards (mistake management, learning statistics, review plans)
+- Login/registration buttons
+- Responsive design + gradient background
 
-### 认证页面 (/auth/*)
-- 统一的视觉风格
-- 表单验证和错误提示
-- 密码显示切换
-- 语言选择 (中文/英文)
+### Authentication Pages (/auth/*)
+- Unified visual style
+- Form validation and error prompts
+- Password visibility toggle
+- Language selection (Chinese/English)
 
 ### Dashboard (/dashboard)
-- 欢迎信息和用户资料
-- 功能模块卡片
-- 注销功能
-- 未来功能预览
+- Welcome message and user profile
+- Feature module cards
+- Logout functionality
+- Future feature preview
 
-## 🛠 技术栈
+## 🛠 Technology Stack
 
-### 后端
-- **运行时**: Node.js + TypeScript
-- **框架**: Express.js
-- **数据库**: SQLite + Prisma ORM
-- **认证**: JWT + bcrypt + Google OAuth 2.0
-- **安全**: Helmet, CORS, Cookie解析
-- **日志**: Morgan + 自定义日志
+### Backend
+- **Runtime**: Node.js + TypeScript
+- **Framework**: Express.js
+- **Database**: SQLite + Prisma ORM
+- **Authentication**: JWT + bcrypt + Google OAuth 2.0
+- **Security**: Helmet, CORS, Cookie parsing
+- **Logging**: Morgan + custom logging
 
-### 前端
-- **框架**: Next.js 15 (App Router)
-- **样式**: Tailwind CSS
-- **状态管理**: Zustand
-- **HTTP客户端**: Axios
-- **表单处理**: React Hook Form + Yup
-- **类型**: TypeScript
+### Frontend
+- **Framework**: Next.js 15 (App Router)
+- **Styling**: Tailwind CSS
+- **State Management**: Zustand
+- **HTTP Client**: Axios
+- **Form Handling**: React Hook Form + Yup
+- **Types**: TypeScript
 
-## 🔄 下一步开发计划
+## 🔄 Next Development Roadmap
 
-### 核心功能 (MVP)
-- [ ] 错题添加和编辑功能
-- [ ] 科目管理界面
-- [ ] 基础复习功能
-- [ ] 简单的统计页面
+### Core Features (MVP)
+- [ ] Mistake question add and edit functionality
+- [ ] Subject management interface
+- [ ] Basic review functionality
+- [ ] Simple statistics page
 
-### 扩展功能
-- [ ] 图片上传和管理
-- [ ] 智能复习算法
-- [ ] 学习进度追踪
-- [ ] 数据导入/导出
+### Extended Features
+- [ ] Image upload and management
+- [ ] Smart review algorithm
+- [ ] Learning progress tracking
+- [ ] Data import/export
 
-### 优化
-- [ ] 移动端适配
-- [ ] PWA支持
-- [ ] 国际化 (i18n)
-- [ ] 服务器端渲染优化
+### Optimization
+- [ ] Mobile adaptation
+- [ ] PWA support
+- [ ] Internationalization (i18n)
+- [ ] Server-side rendering optimization
 
-## 📝 使用说明
+## 📝 Usage Instructions
 
-### 启动服务
+### Start Services
 ```bash
-# 后端
+# Backend
 cd backend
 npm run dev
 
-# 前端  
+# Frontend  
 cd frontend
 npm run dev
 ```
 
-### 测试认证
+### Test Authentication
 ```bash
 ./test-auth-flow.sh
 ```
 
-### 访问应用
-- 主页: http://localhost:3001
-- 登录: http://localhost:3001/auth/login  
-- 注册: http://localhost:3001/auth/register
+### Access Application
+- Homepage: http://localhost:3001
+- Login: http://localhost:3001/auth/login  
+- Registration: http://localhost:3001/auth/register
 
-## 🏆 项目亮点
+## 🏆 Project Highlights
 
-1. **完整的认证系统** - 支持传统登录和Google OAuth
-2. **现代技术栈** - Next.js 15 + TypeScript + Tailwind
-3. **性能优化** - 多层缓存 + 数据库连接优化  
-4. **用户体验** - 响应式设计 + 流畅的认证流程
-5. **开发体验** - 完整的TypeScript支持 + 热重载
-6. **测试覆盖** - 自动化API测试 + 手动UI测试
+1. **Complete Authentication System** - Supports traditional login and Google OAuth
+2. **Modern Technology Stack** - Next.js 15 + TypeScript + Tailwind
+3. **Performance Optimization** - Multi-layer caching + database connection optimization  
+4. **User Experience** - Responsive design + smooth authentication flow
+5. **Developer Experience** - Complete TypeScript support + hot reload
+6. **Test Coverage** - Automated API testing + manual UI testing
 
 ---
 
-**状态**: ✅ MVP认证功能完整，可以开始核心业务功能开发
+**Status**: ✅ MVP authentication functionality complete, ready to start core business feature development
 **最后更新**: 2025-09-12T13:42:37Z

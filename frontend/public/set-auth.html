@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>设置认证信息</title>
+    <meta charset="utf-8">
+</head>
+<body>
+    <h1>设置测试用认证信息</h1>
+    <button onclick="setAuth()">设置认证信息</button>
+    <button onclick="clearAuth()">清除认证信息</button>
+    <div id="status"></div>
+
+    <script>
+        function setAuth() {
+            // 设置测试用的token和用户信息
+            localStorage.setItem('accessToken', 'test-access-token');
+            localStorage.setItem('user', JSON.stringify({
+                id: '1',
+                email: 'test@example.com',
+                name: 'Test User',
+                role: 'USER',
+                preferredLanguage: 'zh',
+                createdAt: '2025-09-12T17:19:17.734Z'
+            }));
+            
+            document.getElementById('status').innerHTML = '<p style="color: green;">认证信息已设置！现在可以去测试创建错题功能了。</p>';
+        }
+
+        function clearAuth() {
+            localStorage.removeItem('accessToken');
+            localStorage.removeItem('user');
+            document.getElementById('status').innerHTML = '<p style="color: red;">认证信息已清除。</p>';
+        }
+
+        // 显示当前认证状态
+        window.onload = function() {
+            const token = localStorage.getItem('accessToken');
+            const user = localStorage.getItem('user');
+            
+            if (token && user) {
+                document.getElementById('status').innerHTML = '<p style="color: blue;">当前已有认证信息。</p>';
+            } else {
+                document.getElementById('status').innerHTML = '<p style="color: gray;">当前无认证信息。</p>';
+            }
+        }
+    </script>
+</body>
+</html>
