@@ -5,6 +5,7 @@ import morgan from 'morgan';
 import dotenv from 'dotenv';
 import cookieParser from 'cookie-parser';
 import authRoutes from './routes/auth';
+import subjectsRoutes from './routes/subjects';
 import { authenticate, optionalAuthenticate } from './middlewares/auth';
 import { prisma } from './utils/database';
 
@@ -35,21 +36,6 @@ app.use(cors({
 app.use(express.json({ limit: '2mb' }));
 app.use(express.urlencoded({ extended: true, limit: '2mb' }));
 app.use(cookieParser()); // Cookie解析中间件
-
-// 添加响应超时保护中间件
-app.use((req: Request, res: Response, next: NextFunction) => {
-  // 为每个响应设置5秒超时
-  res.setTimeout(5000, () => {
-    if (!res.headersSent) {
-      res.status(503).json({ 
-        success: false, 
-        error: 'Server response timeout',
-        timestamp: new Date().toISOString()
-      });
-    }
-  });
-  next();
-});
 
 // 基础路由
 app.get('/', (req: Request, res: Response) => {
@@ -96,7 +82,16 @@ app.get('/health', async (req: Request, res: Response) => {
 // 认证路由
 app.use('/api/auth', authRoutes);
 
-// API v1 基础路由
+// Debug route to test basic POST functionality
+app.post('/api/v1/test', (req: Request, res: Response) => {
+  res.json({ message: 'Test route works', method: 'POST' });
+});
+
+// API v1 路由 (具体路由要放在通用路由前面)
+console.log('Loading subjects routes...');
+app.use('/api/v1/subjects', subjectsRoutes);
+
+// API v1 基础路由 (放在所有具体路由后面)
 app.get('/api/v1', optionalAuthenticate, (req: Request, res: Response) => {
   res.json({
     message: 'BZ StudyPal API v1',
@@ -117,28 +112,9 @@ app.get('/api/v1', optionalAuthenticate, (req: Request, res: Response) => {
   });
 });
 
-// 获取科目列表（测试路由）
-app.get('/api/v1/subjects', async (req: Request, res: Response) => {
-  try {
-    const subjects = await prisma.subject.findMany({
-      orderBy: { order: 'asc' }
-    });
-    
-    res.json({
-      success: true,
-      data: subjects,
-      count: subjects.length
-    });
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      error: error instanceof Error ? error.message : 'Failed to fetch subjects'
-    });
-  }
-});
 
-// 404处理 - 使用新版path-to-regexp兼容的语法
-app.all('/*path', (req: Request, res: Response) => {
+// 404处理
+app.use((req: Request, res: Response) => {
   res.status(404).json({
     error: 'Route not found',
     path: req.originalUrl,
