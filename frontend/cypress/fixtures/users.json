@@ -1,0 +1,134 @@
+{
+  "validUser": {
+    "name": "Test User",
+    "email": "testuser@example.com",
+    "password": "TestPass123",
+    "preferredLanguage": "zh"
+  },
+  "adminUser": {
+    "name": "Admin User",
+    "email": "admin@example.com",
+    "password": "AdminPass123",
+    "preferredLanguage": "en",
+    "role": "ADMIN"
+  },
+  "invalidUser": {
+    "email": "invalid@example.com",
+    "password": "wrongpassword"
+  },
+  "registrationData": {
+    "valid": {
+      "name": "New User",
+      "email": "newuser@example.com",
+      "password": "NewUserPass123",
+      "confirmPassword": "NewUserPass123",
+      "preferredLanguage": "zh"
+    },
+    "missingName": {
+      "name": "",
+      "email": "noname@example.com",
+      "password": "Password123",
+      "confirmPassword": "Password123",
+      "preferredLanguage": "zh"
+    },
+    "invalidEmail": {
+      "name": "Test User",
+      "email": "not-an-email",
+      "password": "Password123",
+      "confirmPassword": "Password123",
+      "preferredLanguage": "zh"
+    },
+    "shortPassword": {
+      "name": "Test User",
+      "email": "shortpass@example.com",
+      "password": "short",
+      "confirmPassword": "short",
+      "preferredLanguage": "zh"
+    },
+    "passwordMismatch": {
+      "name": "Test User",
+      "email": "mismatch@example.com",
+      "password": "Password123",
+      "confirmPassword": "DifferentPassword123",
+      "preferredLanguage": "zh"
+    }
+  },
+  "apiResponses": {
+    "loginSuccess": {
+      "success": true,
+      "message": "Login successful",
+      "data": {
+        "user": {
+          "id": "user123",
+          "email": "testuser@example.com",
+          "name": "Test User",
+          "role": "STUDENT",
+          "preferredLanguage": "zh",
+          "createdAt": "2024-01-01T00:00:00Z"
+        },
+        "tokens": {
+          "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+          "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+          "expiresAt": "2024-01-01T01:00:00Z"
+        }
+      }
+    },
+    "loginFailure": {
+      "success": false,
+      "error": "Invalid credentials",
+      "code": "INVALID_CREDENTIALS"
+    },
+    "registerSuccess": {
+      "success": true,
+      "message": "User registered successfully",
+      "data": {
+        "user": {
+          "id": "newuser123",
+          "email": "newuser@example.com",
+          "name": "New User",
+          "role": "STUDENT",
+          "preferredLanguage": "zh",
+          "createdAt": "2024-01-01T00:00:00Z"
+        },
+        "tokens": {
+          "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+          "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+          "expiresAt": "2024-01-01T01:00:00Z"
+        }
+      }
+    },
+    "registerFailure": {
+      "success": false,
+      "error": "User already exists",
+      "code": "USER_EXISTS"
+    },
+    "profileSuccess": {
+      "success": true,
+      "data": {
+        "user": {
+          "id": "user123",
+          "email": "testuser@example.com",
+          "name": "Test User",
+          "role": "STUDENT",
+          "status": "ACTIVE",
+          "preferredLanguage": "zh",
+          "grade": null,
+          "school": null,
+          "avatar": null,
+          "emailVerified": false,
+          "createdAt": "2024-01-01T00:00:00Z",
+          "lastLogin": "2024-01-01T12:00:00Z",
+          "_count": {
+            "questions": 0,
+            "bookmarks": 0,
+            "reviews": 0
+          }
+        }
+      }
+    },
+    "logoutSuccess": {
+      "success": true,
+      "message": "Logged out successfully"
+    }
+  }
+}

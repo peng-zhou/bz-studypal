@@ -1,160 +1,80 @@
-'use client';
-
-import { useState, useEffect } from 'react';
-import Image from "next/image";
+import Link from 'next/link';
 
 export default function Home() {
-  const [apiStatus, setApiStatus] = useState<'loading' | 'connected' | 'error'>('loading');
-  const [subjects, setSubjects] = useState<any[]>([]);
-
-  useEffect(() => {
-    // 测试API连接
-    const testAPI = async () => {
-      try {
-        // 测试健康检查
-        const healthResponse = await fetch('http://localhost:8000/health');
-        const healthData = await healthResponse.json();
-        
-        if (healthData.status === 'healthy') {
-          setApiStatus('connected');
-          
-          // 获取科目列表
-          const subjectsResponse = await fetch('http://localhost:8000/api/v1/subjects');
-          const subjectsData = await subjectsResponse.json();
-          
-          if (subjectsData.success) {
-            setSubjects(subjectsData.data);
-          }
-        }
-      } catch (error) {
-        console.error('API连接失败:', error);
-        setApiStatus('error');
-      }
-    };
-
-    testAPI();
-  }, []);
-
   return (
-    <div className="min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="max-w-4xl mx-auto">
-        {/* 项目标题 */}
-        <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold mb-4">
-            🎓 BZ StudyPal
-          </h1>
-          <h2 className="text-xl text-gray-600 dark:text-gray-400">
-            智能错题管理与复习系统 | Smart Wrong Question Management & Review System
-          </h2>
-        </div>
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-600 to-purple-600">
+      <div className="max-w-4xl mx-auto p-8">
+        <div className="bg-white/95 backdrop-blur-sm rounded-3xl shadow-2xl p-12 text-center">
+          {/* Logo 和标题 */}
+          <div className="mb-12">
+            <div className="text-8xl mb-6">🎓</div>
+            <h1 
+              className="text-6xl font-bold mb-4 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent"
+            >
+              BZ StudyPal
+            </h1>
+            <h2 className="text-2xl text-gray-600 mb-4">
+              智能错题管理系统
+            </h2>
+            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+              双语版MVP错题管理与复习系统，帮助您高效管理和复习错题，提升学习效果。
+            </p>
+          </div>
 
-        {/* API状态检查 */}
-        <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-6 mb-8">
-          <h3 className="text-lg font-semibold mb-4">🔧 系统状态检查 | System Status</h3>
-          
-          <div className="space-y-3">
-            <div className="flex items-center gap-3">
-              <span className="text-sm font-medium">前端服务:</span>
-              <span className="px-2 py-1 bg-green-100 text-green-800 rounded text-sm">
-                ✅ 运行中 (localhost:3000)
-              </span>
-            </div>
-            
-            <div className="flex items-center gap-3">
-              <span className="text-sm font-medium">后端API:</span>
-              {apiStatus === 'loading' && (
-                <span className="px-2 py-1 bg-yellow-100 text-yellow-800 rounded text-sm">
-                  ⏳ 连接中...
-                </span>
-              )}
-              {apiStatus === 'connected' && (
-                <span className="px-2 py-1 bg-green-100 text-green-800 rounded text-sm">
-                  ✅ 已连接 (localhost:8000)
-                </span>
-              )}
-              {apiStatus === 'error' && (
-                <span className="px-2 py-1 bg-red-100 text-red-800 rounded text-sm">
-                  ❌ 连接失败
-                </span>
-              )}
-            </div>
-            
-            <div className="flex items-center gap-3">
-              <span className="text-sm font-medium">数据库:</span>
-              {apiStatus === 'connected' && (
-                <span className="px-2 py-1 bg-green-100 text-green-800 rounded text-sm">
-                  ✅ SQLite 已连接
-                </span>
-              )}
-              {apiStatus !== 'connected' && (
-                <span className="px-2 py-1 bg-gray-100 text-gray-600 rounded text-sm">
-                  ⏸️ 等待连接
-                </span>
-              )}
+          {/* 功能介绍 */}
+          <div className="mb-12">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              <div className="text-center">
+                <h3 className="text-xl font-semibold text-blue-600 mb-2">
+                  📚 错题管理
+                </h3>
+                <p className="text-gray-600">
+                  智能分类和标签管理
+                </p>
+              </div>
+              <div className="text-center">
+                <h3 className="text-xl font-semibold text-blue-600 mb-2">
+                  📈 学习统计
+                </h3>
+                <p className="text-gray-600">
+                  可视化的进度分析
+                </p>
+              </div>
+              <div className="text-center">
+                <h3 className="text-xl font-semibold text-blue-600 mb-2">
+                  📝 复习计划
+                </h3>
+                <p className="text-gray-600">
+                  个性化复习推荐
+                </p>
+              </div>
             </div>
           </div>
-        </div>
 
-        {/* 科目列表测试 */}
-        {subjects.length > 0 && (
-          <div className="bg-white dark:bg-gray-900 rounded-lg p-6 shadow-sm border">
-            <h3 className="text-lg font-semibold mb-4">📚 可用科目 | Available Subjects ({subjects.length})</h3>
-            <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
-              {subjects.map((subject) => (
-                <div 
-                  key={subject.id}
-                  className="p-3 rounded-md border text-center"
-                  style={{ borderColor: subject.color }}
-                >
-                  <div className="text-sm font-medium">{subject.nameZh}</div>
-                  <div className="text-xs text-gray-500">{subject.nameEn}</div>
-                </div>
-              ))}
-            </div>
+          {/* 操作按钮 */}
+          <div className="flex flex-col sm:flex-row gap-6 justify-center items-center mb-8">
+            <Link
+              href="/auth/login"
+              className="inline-flex items-center px-8 py-4 bg-blue-600 hover:bg-blue-700 text-white text-lg font-medium rounded-xl shadow-lg transition-colors duration-200 min-w-[200px] justify-center"
+            >
+              🔑 立即登录
+            </Link>
+            <Link
+              href="/auth/register"
+              className="inline-flex items-center px-8 py-4 border-2 border-blue-600 text-blue-600 hover:bg-blue-50 text-lg font-medium rounded-xl shadow-lg transition-colors duration-200 min-w-[200px] justify-center"
+            >
+              👤 免费注册
+            </Link>
           </div>
-        )}
 
-        {/* 项目信息 */}
-        <div className="mt-12 grid md:grid-cols-2 gap-8">
-          <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-6">
-            <h3 className="text-lg font-semibold mb-3">🎯 核心功能</h3>
-            <ul className="space-y-2 text-sm">
-              <li>✅ 中英文双语支持</li>
-              <li>✅ Google OAuth 登录</li>
-              <li>✅ 错题拍照录入</li>
-              <li>✅ 智能分类管理</li>
-              <li>✅ 收藏复习系统</li>
-              <li>✅ 学习进度统计</li>
-            </ul>
-          </div>
-          
-          <div className="bg-green-50 dark:bg-green-900/20 rounded-lg p-6">
-            <h3 className="text-lg font-semibold mb-3">🛠️ 技术栈</h3>
-            <ul className="space-y-2 text-sm">
-              <li><strong>前端:</strong> Next.js 13+, TypeScript, Tailwind CSS</li>
-              <li><strong>后端:</strong> Express.js, Prisma ORM</li>
-              <li><strong>数据库:</strong> SQLite (开发) / PostgreSQL (生产)</li>
-              <li><strong>认证:</strong> JWT + Google OAuth</li>
-              <li><strong>国际化:</strong> next-i18next</li>
-            </ul>
+          {/* 版本信息 */}
+          <div className="pt-8 border-t border-gray-200">
+            <p className="text-sm text-gray-500">
+              版本 1.0.0 - MVP 测试版
+            </p>
           </div>
         </div>
-
-        {/* GitHub链接 */}
-        <div className="mt-8 text-center">
-          <a 
-            href="https://github.com/peng-zhou/bz-studypal"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 px-4 py-2 bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 rounded-lg hover:opacity-80 transition-opacity"
-          >
-            <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-              <path fillRule="evenodd" d="M10 0C4.477 0 0 4.484 0 10.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0110 4.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.203 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.942.359.31.678.921.678 1.856 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0020 10.017C20 4.484 15.522 0 10 0z" clipRule="evenodd" />
-            </svg>
-            查看 GitHub 仓库
-          </a>
-        </div>
-      </main>
+      </div>
     </div>
   );
 }
