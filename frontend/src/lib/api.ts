@@ -116,6 +116,45 @@ export const authAPI = {
   },
 };
 
+// 科目管理API
+export const subjectsAPI = {
+  // 获取所有科目
+  getSubjects: async () => {
+    const response = await api.get('/api/v1/subjects');
+    return response.data;
+  },
+
+  // 根据ID获取科目
+  getSubjectById: async (id: string) => {
+    const response = await api.get(`/api/v1/subjects/${id}`);
+    return response.data;
+  },
+
+  // 创建科目
+  createSubject: async (data: CreateSubjectData) => {
+    const response = await api.post('/api/v1/subjects', data);
+    return response.data;
+  },
+
+  // 更新科目
+  updateSubject: async (id: string, data: UpdateSubjectData) => {
+    const response = await api.put(`/api/v1/subjects/${id}`, data);
+    return response.data;
+  },
+
+  // 删除科目
+  deleteSubject: async (id: string) => {
+    const response = await api.delete(`/api/v1/subjects/${id}`);
+    return response.data;
+  },
+
+  // 更新科目排序
+  updateSubjectsOrder: async (data: SubjectsOrderData) => {
+    const response = await api.post('/api/v1/subjects/reorder', data);
+    return response.data;
+  },
+};
+
 // 类型定义
 export interface LoginData {
   email: string;
@@ -156,4 +195,43 @@ export interface ApiError {
   error: string;
   code?: string;
   details?: any;
+}
+
+// 科目相关接口定义
+export interface Subject {
+  id: string;
+  code: string;
+  nameZh: string;
+  nameEn: string;
+  description?: string;
+  color?: string;
+  order: number;
+  _count?: {
+    questions: number;
+  };
+}
+
+export interface CreateSubjectData {
+  code: string;
+  nameZh: string;
+  nameEn: string;
+  description?: string;
+  color?: string;
+  order?: number;
+}
+
+export interface UpdateSubjectData {
+  code?: string;
+  nameZh?: string;
+  nameEn?: string;
+  description?: string;
+  color?: string;
+  order?: number;
+}
+
+export interface SubjectsOrderData {
+  subjects: Array<{
+    id: string;
+    order: number;
+  }>;
 }

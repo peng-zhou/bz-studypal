@@ -90,6 +90,21 @@ export default function DashboardPage() {
 
         {/* 功能卡片 */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {/* 科目管理 */}
+          <div className="bg-white rounded-lg shadow-sm p-6 hover:shadow-md transition-shadow">
+            <div className="flex items-center mb-4">
+              <div className="text-3xl mr-3">🏷️</div>
+              <h3 className="text-lg font-semibold text-gray-900">科目管理</h3>
+            </div>
+            <p className="text-gray-600 mb-4">管理学习科目和分类</p>
+            <button 
+              onClick={() => router.push('/subjects')}
+              className="w-full py-2 px-4 bg-indigo-600 hover:bg-indigo-700 text-white rounded-md transition-colors"
+            >
+              管理科目
+            </button>
+          </div>
+          
           {/* 错题管理 */}
           <div className="bg-white rounded-lg shadow-sm p-6 hover:shadow-md transition-shadow">
             <div className="flex items-center mb-4">
