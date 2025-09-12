@@ -199,6 +199,29 @@ export const questionsAPI = {
     const response = await api.get('/api/v1/questions/stats');
     return response.data;
   },
+
+  // Upload question images
+  uploadImages: async (files: File[]) => {
+    const formData = new FormData();
+    files.forEach(file => {
+      formData.append('images', file);
+    });
+    
+    const response = await api.post('/api/v1/questions/upload', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+    return response.data;
+  },
+
+  // Delete question image
+  deleteImage: async (imageUrl: string) => {
+    const response = await api.delete('/api/v1/questions/delete-image', {
+      data: { imageUrl }
+    });
+    return response.data;
+  },
 };
 
 // Type definitions

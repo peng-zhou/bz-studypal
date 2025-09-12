@@ -89,5 +89,23 @@
     "startReview": "开始复习",
     "noRecentActivity": "暂无活动记录"
   },
-  "unknown": "未知"
+  "unknown": "未知",
+  "dropFilesHere": "拖放文件到这里",
+  "dragDropOrClick": "拖放图片到这里，或点击选择",
+  "supportedFormats": "支持格式",
+  "maxFileSize": "最大文件大小",
+  "maxFiles": "最多文件数",
+  "imagesUploaded": "张图片已上传",
+  "uploading": "上传中...",
+  "imageUpload": {
+    "title": "题目图片",
+    "description": "上传与此题目相关的图片",
+    "dropzone": "拖放图片到这里或点击浏览",
+    "uploading": "正在上传图片...",
+    "uploadError": "图片上传失败",
+    "deleteError": "图片删除失败",
+    "maxFilesReached": "已达到最大文件数量",
+    "fileTooLarge": "文件过大",
+    "invalidFileType": "无效的文件类型"
+  }
 }

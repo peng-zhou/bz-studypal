@@ -4,6 +4,7 @@ import helmet from 'helmet';
 import morgan from 'morgan';
 import dotenv from 'dotenv';
 import cookieParser from 'cookie-parser';
+import path from 'path';
 import authRoutes from './routes/auth';
 import subjectsRoutes from './routes/subjects';
 import questionsRoutes from './routes/questions';
@@ -37,6 +38,9 @@ app.use(cors({
 app.use(express.json({ limit: '2mb' }));
 app.use(express.urlencoded({ extended: true, limit: '2mb' }));
 app.use(cookieParser()); // Cookie解析中间件
+
+// Serve static files for uploaded images
+app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 
 // 基础路由
 app.get('/', (req: Request, res: Response) => {

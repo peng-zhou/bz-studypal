@@ -1,6 +1,8 @@
 import { Request, Response } from 'express';
 import { body, query, validationResult } from 'express-validator';
 import { prisma } from '../utils/database';
+import path from 'path';
+import fs from 'fs';
 
 /**
  * 获取当前用户的错题列表
@@ -789,3 +791,100 @@ export const getQuestionsValidation = [
     .isIn(['asc', 'desc'])
     .withMessage('Sort order must be asc or desc')
 ];
+
+/**
+ * 上传错题图片
+ */
+export const uploadQuestionImages = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const userId = req.user?.id;
+    if (!userId) {
+      res.status(401).json({
+        success: false,
+        error: 'User not authenticated',
+        code: 'USER_NOT_AUTHENTICATED'
+      });
+      return;
+    }
+
+    const files = req.files as Express.Multer.File[];
+    if (!files || files.length === 0) {
+      res.status(400).json({
+        success: false,
+        error: 'No files uploaded'
+      });
+      return;
+    }
+
+    // Generate file URLs
+    const imageUrls = files.map(file => {
+      return `/uploads/questions/${file.filename}`;
+    });
+
+    res.json({
+      success: true,
+      message: `Successfully uploaded ${files.length} image(s)`,
+      data: {
+        images: imageUrls,
+        count: files.length
+      }
+    });
+  } catch (error) {
+    console.error('Upload question images error:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to upload images'
+    });
+  }
+};
+
+/**
+ * 删除错题图片
+ */
+export const deleteQuestionImage = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const userId = req.user?.id;
+    if (!userId) {
+      res.status(401).json({
+        success: false,
+        error: 'User not authenticated',
+        code: 'USER_NOT_AUTHENTICATED'
+      });
+      return;
+    }
+
+    const { imageUrl } = req.body;
+    if (!imageUrl) {
+      res.status(400).json({
+        success: false,
+        error: 'Image URL is required'
+      });
+      return;
+    }
+
+    // Extract filename from URL
+    const filename = path.basename(imageUrl);
+    const uploadsDir = path.join(__dirname, '../../uploads/questions');
+    const filePath = path.join(uploadsDir, filename);
+
+    // Check if file exists and belongs to user (filename contains userId)
+    if (fs.existsSync(filePath) && filename.includes(userId)) {
+      fs.unlinkSync(filePath);
+      res.json({
+        success: true,
+        message: 'Image deleted successfully'
+      });
+    } else {
+      res.status(404).json({
+        success: false,
+        error: 'Image not found or access denied'
+      });
+    }
+  } catch (error) {
+    console.error('Delete question image error:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to delete image'
+    });
+  }
+};

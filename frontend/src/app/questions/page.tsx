@@ -6,6 +6,7 @@ import { useTranslation } from 'react-i18next';
 import { useAuthStore } from '@/stores/authStore';
 import { api, questionsAPI, subjectsAPI } from '@/lib/api';
 import AppLayout from '../../components/layout/AppLayout';
+import ImageUpload from '../../components/ui/ImageUpload';
 
 interface Subject {
   id: string;
@@ -118,6 +119,7 @@ export default function QuestionsPage() {
   const [createFormData, setCreateFormData] = useState({
     title: '',
     content: '',
+    images: [] as string[],
     myAnswer: '',
     correctAnswer: '',
     explanation: '',
@@ -131,6 +133,7 @@ export default function QuestionsPage() {
   const [editFormData, setEditFormData] = useState({
     title: '',
     content: '',
+    images: [] as string[],
     myAnswer: '',
     correctAnswer: '',
     explanation: '',
@@ -311,6 +314,7 @@ export default function QuestionsPage() {
     setCreateFormData({
       title: '',
       content: '',
+      images: [],
       myAnswer: '',
       correctAnswer: '',
       explanation: '',
@@ -327,6 +331,7 @@ export default function QuestionsPage() {
     setEditFormData({
       title: question.title || '',
       content: question.content,
+      images: question.images || [],
       myAnswer: question.myAnswer,
       correctAnswer: question.correctAnswer,
       explanation: question.explanation || '',
@@ -344,6 +349,7 @@ export default function QuestionsPage() {
     setEditFormData({
       title: '',
       content: '',
+      images: [],
       myAnswer: '',
       correctAnswer: '',
       explanation: '',
@@ -725,6 +731,33 @@ export default function QuestionsPage() {
                         <p className="text-gray-700 line-clamp-3" data-testid={`content-${question.id}`}>
                           {question.content}
                         </p>
+                        
+                        {/* Question Images */}
+                        {question.images && question.images.length > 0 && (
+                          <div className="mt-3">
+                            <div className="flex flex-wrap gap-2">
+                              {question.images.slice(0, 3).map((imageUrl, index) => (
+                                <div key={index} className="relative">
+                                  <img
+                                    src={`http://localhost:8000${imageUrl}`}
+                                    alt={`Question image ${index + 1}`}
+                                    className="w-16 h-16 object-cover rounded border cursor-pointer hover:opacity-75 transition-opacity"
+                                    onClick={() => {
+                                      // Open image in modal or new tab
+                                      window.open(`http://localhost:8000${imageUrl}`, '_blank');
+                                    }}
+                                    data-testid={`image-${question.id}-${index}`}
+                                  />
+                                </div>
+                              ))}
+                              {question.images.length > 3 && (
+                                <div className="w-16 h-16 bg-gray-100 border rounded flex items-center justify-center text-xs text-gray-500">
+                                  +{question.images.length - 3}
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        )}
                       </div>
                       
                       <div className="mt-3 flex items-center space-x-4 text-sm text-gray-500">
@@ -811,6 +844,19 @@ export default function QuestionsPage() {
                   rows={4}
                   placeholder="请输入错题内容"
                   required
+                />
+              </div>
+
+              {/* Question Images */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  {t('common.imageUpload.title')}
+                </label>
+                <ImageUpload
+                  images={createFormData.images}
+                  onChange={(images) => setCreateFormData({ ...createFormData, images })}
+                  maxFiles={5}
+                  disabled={loading}
                 />
               </div>
 
@@ -987,6 +1033,19 @@ export default function QuestionsPage() {
                   rows={4}
                   placeholder="请输入错题内容"
                   required
+                />
+              </div>
+
+              {/* Question Images */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  {t('common.imageUpload.title')}
+                </label>
+                <ImageUpload
+                  images={editFormData.images}
+                  onChange={(images) => setEditFormData({ ...editFormData, images })}
+                  maxFiles={5}
+                  disabled={loading}
                 />
               </div>
 

@@ -8,11 +8,14 @@ import {
   deleteQuestion,
   batchDeleteQuestions,
   getQuestionStats,
+  uploadQuestionImages,
+  deleteQuestionImage,
   createQuestionValidation,
   updateQuestionValidation,
   batchDeleteValidation,
   getQuestionsValidation
 } from '../controllers/questions';
+import { uploadQuestionImages as uploadMiddleware } from '../middlewares/upload';
 
 const router = express.Router();
 
@@ -475,5 +478,99 @@ router.delete('/:id', deleteQuestion);
  *         $ref: '#/components/responses/InternalError'
  */
 router.post('/batch/delete', batchDeleteValidation, batchDeleteQuestions);
+
+/**
+ * @swagger
+ * /api/questions/upload:
+ *   post:
+ *     summary: Upload question images
+ *     tags: [Questions]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               images:
+ *                 type: array
+ *                 items:
+ *                   type: string
+ *                   format: binary
+ *                 description: Question image files (max 5)
+ *     responses:
+ *       200:
+ *         description: Images uploaded successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 message:
+ *                   type: string
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     images:
+ *                       type: array
+ *                       items:
+ *                         type: string
+ *                       description: Array of uploaded image URLs
+ *                     count:
+ *                       type: integer
+ *                       description: Number of uploaded images
+ *       400:
+ *         $ref: '#/components/responses/ValidationError'
+ *       401:
+ *         $ref: '#/components/responses/Unauthorized'
+ *       500:
+ *         $ref: '#/components/responses/InternalError'
+ */
+router.post('/upload', uploadMiddleware, uploadQuestionImages);
+
+/**
+ * @swagger
+ * /api/questions/delete-image:
+ *   delete:
+ *     summary: Delete question image
+ *     tags: [Questions]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - imageUrl
+ *             properties:
+ *               imageUrl:
+ *                 type: string
+ *                 description: URL of the image to delete
+ *     responses:
+ *       200:
+ *         description: Image deleted successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 message:
+ *                   type: string
+ *       401:
+ *         $ref: '#/components/responses/Unauthorized'
+ *       404:
+ *         $ref: '#/components/responses/NotFound'
+ *       500:
+ *         $ref: '#/components/responses/InternalError'
+ */
+router.delete('/delete-image', deleteQuestionImage);
 
 export default router;
