@@ -6,7 +6,7 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "sqlite"
   url      = env("DATABASE_URL")
 }
 
@@ -84,7 +84,7 @@ model Question {
   // 基本信息
   title       String?  // 题目标题（可选）
   content     String   // 题目内容（文本或HTML）
-  images      String[] // 题目图片URLs数组
+  images      String?  // 题目图片URLs JSON字符串
   
   // 答案信息
   myAnswer       String   // 我的错误答案
@@ -99,8 +99,8 @@ model Question {
   
   // 错误分析
   errorType      ErrorType   @default(OTHER)
-  knowledgePoints String[]   // 知识点数组
-  tags           String[]    // 自定义标签数组
+  knowledgePoints String?   // 知识点JSON字符串
+  tags           String?    // 自定义标签JSON字符串
   
   // 掌握状态
   masteryLevel   MasteryLevel @default(NOT_MASTERED)
