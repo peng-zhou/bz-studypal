@@ -12,6 +12,17 @@ jest.mock('../src/utils/database', () => ({
       update: jest.fn(),
       delete: jest.fn(),
     },
+    question: {
+      findMany: jest.fn(),
+      findFirst: jest.fn(),
+      findUnique: jest.fn(),
+      create: jest.fn(),
+      update: jest.fn(),
+      delete: jest.fn(),
+      deleteMany: jest.fn(),
+      count: jest.fn(),
+      groupBy: jest.fn(),
+    },
     user: {
       findUnique: jest.fn(),
       create: jest.fn(),

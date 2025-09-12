@@ -6,6 +6,7 @@ import dotenv from 'dotenv';
 import cookieParser from 'cookie-parser';
 import authRoutes from './routes/auth';
 import subjectsRoutes from './routes/subjects';
+import questionsRoutes from './routes/questions';
 import { authenticate, optionalAuthenticate } from './middlewares/auth';
 import { prisma } from './utils/database';
 
@@ -90,6 +91,8 @@ app.post('/api/v1/test', (req: Request, res: Response) => {
 // API v1 路由 (具体路由要放在通用路由前面)
 console.log('Loading subjects routes...');
 app.use('/api/v1/subjects', subjectsRoutes);
+console.log('Loading questions routes...');
+app.use('/api/v1/questions', questionsRoutes);
 
 // API v1 基础路由 (放在所有具体路由后面)
 app.get('/api/v1', optionalAuthenticate, (req: Request, res: Response) => {
