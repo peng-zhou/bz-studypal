@@ -1,0 +1,59 @@
+{
+  "appName": "BZ StudyPal",
+  "appTagline": "Smart Wrong Question Management & Review System",
+  "navigation": {
+    "home": "Home",
+    "questions": "Questions",
+    "review": "Review",
+    "bookmarks": "Bookmarks",
+    "profile": "Profile",
+    "admin": "Admin"
+  },
+  "actions": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "submit": "Submit",
+    "edit": "Edit",
+    "delete": "Delete",
+    "add": "Add",
+    "search": "Search",
+    "filter": "Filter",
+    "sort": "Sort",
+    "upload": "Upload",
+    "download": "Download",
+    "share": "Share",
+    "bookmark": "Bookmark",
+    "unbookmark": "Remove Bookmark",
+    "retry": "Retry",
+    "back": "Back",
+    "next": "Next",
+    "previous": "Previous",
+    "close": "Close",
+    "confirm": "Confirm",
+    "loading": "Loading...",
+    "viewMore": "View More"
+  },
+  "status": {
+    "success": "Success",
+    "error": "Error",
+    "warning": "Warning",
+    "info": "Info",
+    "pending": "Pending",
+    "completed": "Completed",
+    "draft": "Draft"
+  },
+  "language": {
+    "chinese": "中文",
+    "english": "English",
+    "switch": "Switch Language"
+  },
+  "time": {
+    "now": "Just now",
+    "minutesAgo": "{{count}} minute(s) ago",
+    "hoursAgo": "{{count}} hour(s) ago",
+    "daysAgo": "{{count}} day(s) ago",
+    "weeksAgo": "{{count}} week(s) ago",
+    "monthsAgo": "{{count}} month(s) ago",
+    "yearsAgo": "{{count}} year(s) ago"
+  }
+}

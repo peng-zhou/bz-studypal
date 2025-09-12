@@ -1,0 +1,101 @@
+# Dependencies
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# Environment variables
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Database
+*.db
+*.sqlite
+dev.db
+prisma/migrations/
+
+# Logs
+logs
+*.log
+
+# Build outputs
+dist/
+build/
+out/
+.next/
+.vercel/
+
+# IDEs and editors
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# File uploads
+uploads/
+*.tmp
+
+# TypeScript
+*.tsbuildinfo
+
+# Coverage directory used by tools like istanbul
+coverage/
+*.lcov
+
+# nyc test coverage
+.nyc_output
+
+# ESLint cache
+.eslintcache
+
+# Prettier cache
+.prettiercache
+
+# Tailwind CSS
+.tailwindcss-cache
+
+# Next.js
+.next/
+.vercel/
+
+# Prisma
+prisma/dev.db*
+
+# Redis dump file
+dump.rdb
+
+# PM2
+.pm2
+
+# Local development
+.env.development
+.env.test
+
+# Backup files
+*.bak
+*.backup
+
+# Temporary files
+tmp/
+temp/

@@ -1,0 +1,260 @@
+// Prisma schema file for BZ StudyPal
+// Learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// 用户模型
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String?
+  avatar    String?
+  grade     String?  // 年级
+  school    String?  // 学校
+  
+  // 认证相关
+  password      String?  // 传统登录密码，可选（Google登录用户可能没有）
+  googleId      String?  @unique // Google OAuth ID
+  emailVerified Boolean  @default(false)
+  
+  // 偏好设置
+  preferredLanguage String @default("zh") // zh, en
+  
+  // 角色和权限
+  role      UserRole @default(STUDENT)
+  status    UserStatus @default(ACTIVE)
+  
+  // 时间戳
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  lastLogin DateTime?
+  
+  // 关联
+  questions    Question[]
+  bookmarks    Bookmark[]
+  folders      BookmarkFolder[]
+  reviews      Review[]
+  sessions     UserSession[]
+  
+  @@map("users")
+}
+
+// 用户角色枚举
+enum UserRole {
+  STUDENT
+  TEACHER
+  PARENT
+  ADMIN
+}
+
+// 用户状态枚举
+enum UserStatus {
+  ACTIVE
+  INACTIVE
+  SUSPENDED
+}
+
+// 科目模型
+model Subject {
+  id          String @id @default(cuid())
+  code        String @unique // math, chinese, english, etc.
+  nameZh      String // 中文名称
+  nameEn      String // 英文名称
+  description String?
+  color       String? // 用于UI显示的颜色
+  order       Int     @default(0) // 排序
+  
+  // 关联
+  questions Question[]
+  
+  @@map("subjects")
+}
+
+// 错题模型
+model Question {
+  id          String   @id @default(cuid())
+  
+  // 基本信息
+  title       String?  // 题目标题（可选）
+  content     String   // 题目内容（文本或HTML）
+  images      String[] // 题目图片URLs数组
+  
+  // 答案信息
+  myAnswer       String   // 我的错误答案
+  correctAnswer  String   // 正确答案
+  explanation    String?  // 解析说明
+  
+  // 分类信息
+  subjectId      String
+  subject        Subject     @relation(fields: [subjectId], references: [id])
+  difficulty     Difficulty  @default(MEDIUM)
+  languageType   LanguageType @default(CHINESE)
+  
+  // 错误分析
+  errorType      ErrorType   @default(OTHER)
+  knowledgePoints String[]   // 知识点数组
+  tags           String[]    // 自定义标签数组
+  
+  // 掌握状态
+  masteryLevel   MasteryLevel @default(NOT_MASTERED)
+  reviewCount    Int          @default(0)
+  correctCount   Int          @default(0)
+  errorCount     Int          @default(1) // 初始错误次数为1
+  
+  // 时间信息
+  addedAt        DateTime     @default(now())
+  lastReviewedAt DateTime?
+  
+  // 所属用户
+  userId         String
+  user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  // 关联
+  bookmarks      Bookmark[]
+  reviews        Review[]
+  
+  @@map("questions")
+}
+
+// 难度等级枚举
+enum Difficulty {
+  EASY
+  MEDIUM
+  HARD
+}
+
+// 语言类型枚举
+enum LanguageType {
+  CHINESE   // 中文题目
+  ENGLISH   // 英文题目
+  BILINGUAL // 双语题目
+}
+
+// 错误类型枚举
+enum ErrorType {
+  CALCULATION    // 计算错误
+  CONCEPTUAL     // 概念理解错误
+  CARELESS       // 粗心大意
+  METHODOLOGICAL // 方法不当
+  KNOWLEDGE      // 知识点遗忘
+  OTHER          // 其他
+}
+
+// 掌握程度枚举
+enum MasteryLevel {
+  NOT_MASTERED      // 未掌握
+  PARTIALLY_MASTERED // 部分掌握
+  MASTERED          // 已掌握
+}
+
+// 收藏夹模型
+model BookmarkFolder {
+  id          String   @id @default(cuid())
+  name        String   // 收藏夹名称
+  description String?  // 描述
+  color       String?  // 颜色标记
+  order       Int      @default(0) // 排序
+  
+  // 时间戳
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  // 所属用户
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  // 关联
+  bookmarks   Bookmark[]
+  
+  @@map("bookmark_folders")
+}
+
+// 收藏模型（多对多关系表）
+model Bookmark {
+  id       String @id @default(cuid())
+  
+  // 关联
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  questionId String
+  question   Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  
+  folderId   String?
+  folder     BookmarkFolder? @relation(fields: [folderId], references: [id], onDelete: SetNull)
+  
+  // 时间戳
+  createdAt  DateTime @default(now())
+  
+  @@unique([userId, questionId])
+  @@map("bookmarks")
+}
+
+// 复习记录模型
+model Review {
+  id          String    @id @default(cuid())
+  
+  // 复习结果
+  isCorrect   Boolean   // 是否答对
+  timeTaken   Int?      // 用时（秒）
+  userAnswer  String?   // 用户本次答案
+  notes       String?   // 复习笔记
+  
+  // 复习类型
+  reviewType  ReviewType @default(REGULAR)
+  
+  // 时间戳
+  reviewedAt  DateTime  @default(now())
+  
+  // 关联
+  userId      String
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  questionId  String
+  question    Question  @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  
+  @@map("reviews")
+}
+
+// 复习类型枚举
+enum ReviewType {
+  REGULAR    // 常规复习
+  RANDOM     // 随机复习
+  BOOKMARK   // 收藏夹复习
+  CATEGORY   // 分类复习
+  RETAKE     // 错题重做
+}
+
+// 系统配置模型（用于存储系统级设置）
+model SystemConfig {
+  id    String @id @default(cuid())
+  key   String @unique
+  value String
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  @@map("system_configs")
+}
+
+// 用户会话模型（用于JWT刷新令牌管理）
+model UserSession {
+  id           String   @id @default(cuid())
+  userId       String
+  refreshToken String   @unique
+  userAgent    String?
+  ipAddress    String?
+  expiresAt    DateTime
+  createdAt    DateTime @default(now())
+  
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@map("user_sessions")
+}

@@ -1,0 +1,119 @@
+{
+  "title": "错题管理",
+  "addQuestion": "添加错题",
+  "editQuestion": "编辑错题",
+  "deleteQuestion": "删除错题",
+  "questionDetails": "错题详情",
+  "myAnswer": "我的答案",
+  "correctAnswer": "正确答案",
+  "explanation": "解析",
+  "subject": "科目",
+  "difficulty": "难度",
+  "tags": "标签",
+  "addTag": "添加标签",
+  "category": "分类",
+  "errorType": "错误类型",
+  "masteryStatus": "掌握状态",
+  "addedTime": "添加时间",
+  "lastReviewTime": "最后复习时间",
+  "reviewCount": "复习次数",
+  "errorCount": "错误次数",
+  "uploadImage": "上传图片",
+  "uploadFromCamera": "拍照上传",
+  "uploadFromGallery": "从相册选择",
+  "questionContent": "题目内容",
+  "enterQuestionContent": "请输入题目内容",
+  "enterMyAnswer": "请输入我的答案",
+  "enterCorrectAnswer": "请输入正确答案",
+  "enterExplanation": "请输入解析",
+  "subjects": {
+    "math": "数学",
+    "chinese": "语文", 
+    "english": "英语",
+    "physics": "物理",
+    "chemistry": "化学",
+    "biology": "生物",
+    "history": "历史",
+    "geography": "地理",
+    "politics": "政治",
+    "other": "其他"
+  },
+  "difficulties": {
+    "easy": "简单",
+    "medium": "中等",
+    "hard": "困难"
+  },
+  "errorTypes": {
+    "calculation": "计算错误",
+    "conceptual": "概念理解错误",
+    "careless": "粗心大意",
+    "methodological": "方法不当",
+    "knowledge": "知识点遗忘",
+    "other": "其他"
+  },
+  "masteryLevels": {
+    "notMastered": "未掌握",
+    "partiallyMastered": "部分掌握",
+    "mastered": "已掌握"
+  },
+  "languageTypes": {
+    "chinese": "中文题目",
+    "english": "英文题目",
+    "bilingual": "双语题目"
+  },
+  "filters": {
+    "all": "全部",
+    "bySubject": "按科目",
+    "byDifficulty": "按难度",
+    "byMastery": "按掌握程度",
+    "byLanguage": "按语言",
+    "recent": "最近添加",
+    "needReview": "需要复习"
+  },
+  "sort": {
+    "newest": "最新添加",
+    "oldest": "最早添加",
+    "mostReviewed": "复习最多",
+    "leastReviewed": "复习最少",
+    "difficulty": "按难度",
+    "subject": "按科目"
+  },
+  "search": {
+    "placeholder": "搜索错题内容、标签或解析...",
+    "noResults": "未找到相关错题",
+    "resultsCount": "找到 {{count}} 道错题"
+  },
+  "actions": {
+    "addToBookmarks": "添加到收藏夹",
+    "removeFromBookmarks": "从收藏夹移除", 
+    "startReview": "开始复习",
+    "markAsMastered": "标记为已掌握",
+    "markAsNotMastered": "标记为未掌握",
+    "duplicate": "复制题目",
+    "export": "导出题目"
+  },
+  "messages": {
+    "questionAdded": "错题添加成功",
+    "questionUpdated": "错题更新成功",
+    "questionDeleted": "错题删除成功",
+    "addToBookmarksSuccess": "已添加到收藏夹",
+    "removeFromBookmarksSuccess": "已从收藏夹移除",
+    "masteryUpdated": "掌握状态已更新",
+    "noQuestions": "还没有错题，快来添加第一道吧！",
+    "confirmDelete": "确定要删除这道错题吗？",
+    "deleteSuccess": "删除成功",
+    "imageUploadFailed": "图片上传失败，请重试",
+    "questionRequired": "请输入题目内容",
+    "answerRequired": "请输入答案内容"
+  },
+  "statistics": {
+    "totalQuestions": "总错题数",
+    "masteredQuestions": "已掌握",
+    "needReviewQuestions": "需复习",
+    "recentlyAdded": "本周新增",
+    "reviewProgress": "复习进度",
+    "masteryRate": "掌握率",
+    "subjectDistribution": "科目分布",
+    "difficultyDistribution": "难度分布"
+  }
+}
