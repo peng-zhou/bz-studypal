@@ -99,3 +99,5 @@ dump.rdb
 # Temporary files
 tmp/
 temp/
+backend/nohup.out
+*.log
