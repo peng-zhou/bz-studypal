@@ -56,8 +56,22 @@ app.get('/', (req: Request, res: Response) => {
   });
 });
 
-// 健康检查路由 - 优化为非阻塞式
-app.get('/health', async (req: Request, res: Response) => {
+// 简单测试端点
+app.get('/ping', (req: Request, res: Response) => {
+  res.send('pong');
+});
+
+// 健康检查路由 - 简化版本
+app.get('/health', (req: Request, res: Response) => {
+  res.json({
+    status: 'healthy',
+    timestamp: new Date().toISOString(),
+    environment: process.env.NODE_ENV || 'development'
+  });
+});
+
+// 数据库健康检查 - 单独的端点
+app.get('/health/db', async (req: Request, res: Response) => {
   let databaseStatus = 'unknown';
   
   try {

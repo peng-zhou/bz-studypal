@@ -3,12 +3,30 @@ import axios from 'axios';
 // Create axios instance
 export const api = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000',
-  timeout: 10000,
+  timeout: 30000, // 增加到 30 秒
   headers: {
     'Content-Type': 'application/json',
   },
   withCredentials: true, // Support cookie authentication
 });
+
+// 重试配置
+const MAX_RETRIES = 3;
+const RETRY_DELAY = 1000; // 1秒
+
+// 重试函数
+const retryRequest = async (fn: () => Promise<any>, retries = MAX_RETRIES): Promise<any> => {
+  try {
+    return await fn();
+  } catch (error: any) {
+    if (retries > 0 && (error.code === 'ECONNABORTED' || error.code === 'ETIMEDOUT' || error.response?.status >= 500)) {
+      console.warn(`Request failed, retrying... (${MAX_RETRIES - retries + 1}/${MAX_RETRIES})`);
+      await new Promise(resolve => setTimeout(resolve, RETRY_DELAY));
+      return retryRequest(fn, retries - 1);
+    }
+    throw error;
+  }
+};
 
 // Request interceptor - Add authentication token
 api.interceptors.request.use(
@@ -87,8 +105,10 @@ export const authAPI = {
 
   // Get user profile
   getProfile: async () => {
-    const response = await api.get('/api/auth/profile');
-    return response.data;
+    return retryRequest(async () => {
+      const response = await api.get('/api/auth/profile');
+      return response.data;
+    });
   },
 
   // Logout
@@ -120,8 +140,10 @@ export const authAPI = {
 export const subjectsAPI = {
   // Get all subjects
   getSubjects: async () => {
-    const response = await api.get('/api/v1/subjects');
-    return response.data;
+    return retryRequest(async () => {
+      const response = await api.get('/api/v1/subjects');
+      return response.data;
+    });
   },
 
   // Get subject by ID
@@ -196,8 +218,10 @@ export const questionsAPI = {
 
   // Get question statistics
   getQuestionStats: async () => {
-    const response = await api.get('/api/v1/questions/stats');
-    return response.data;
+    return retryRequest(async () => {
+      const response = await api.get('/api/v1/questions/stats');
+      return response.data;
+    });
   },
 
   // Upload question images
