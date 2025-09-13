@@ -29,9 +29,12 @@ function checkFile(filePath) {
       console.error(`❌ ${relativePath}: Uses router methods but missing useRouter import`);
       hasErrors = true;
     } else {
-      // Check if router variable is declared
-      const hasRouterDeclaration = content.includes('const router = useRouter()') || 
-                                   content.includes('const router=useRouter()');
+      // Check if router variable is declared (excluding comments)
+      const codeWithoutComments = content
+        .replace(/\/\*[\s\S]*?\*\//g, '') // Remove block comments
+        .replace(/\/\/.*$/gm, ''); // Remove line comments
+      const hasRouterDeclaration = codeWithoutComments.includes('const router = useRouter()') || 
+                                   codeWithoutComments.includes('const router=useRouter()');
       
       if (!hasRouterDeclaration) {
         console.error(`❌ ${relativePath}: Uses router methods but missing 'const router = useRouter()' declaration`);
