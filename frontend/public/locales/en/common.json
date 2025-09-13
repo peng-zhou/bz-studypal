@@ -112,5 +112,42 @@
   },
   "settings": {
     "profile": "Profile Information"
+  },
+  "auth": {
+    "login": "Login",
+    "register": "Register",
+    "logout": "Logout",
+    "email": "Email",
+    "password": "Password",
+    "confirmPassword": "Confirm Password",
+    "name": "Name",
+    "forgotPassword": "Forgot password?",
+    "loginWithGoogle": "Login with Google",
+    "noAccount": "Don't have an account?",
+    "hasAccount": "Already have an account?",
+    "loginHere": "Login here",
+    "registerHere": "Register here",
+    "loginSuccess": "Login successful",
+    "registerSuccess": "Registration successful",
+    "loginFailed": "Login failed",
+    "registerFailed": "Registration failed",
+    "invalidCredentials": "Invalid email or password",
+    "emailAlreadyExists": "Email already exists",
+    "passwordsDontMatch": "Passwords don't match",
+    "emailRequired": "Please enter your email",
+    "passwordRequired": "Please enter your password",
+    "nameRequired": "Please enter your name",
+    "invalidEmail": "Invalid email format",
+    "passwordTooShort": "Password must be at least 6 characters",
+    "authRequired": "You need to login to access this page",
+    "redirectingToLogin": "Redirecting to login page...",
+    "redirectingMessage": "If the page doesn't redirect automatically, please click the button below",
+    "goToLogin": "Go to Login"
+  },
+  "common": {
+    "loading": "Loading...",
+    "error": "Error",
+    "success": "Success",
+    "unknown": "Unknown"
   }
 }

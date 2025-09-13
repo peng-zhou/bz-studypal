@@ -112,5 +112,42 @@
   },
   "settings": {
     "profile": "个人信息"
+  },
+  "auth": {
+    "login": "登录",
+    "register": "注册",
+    "logout": "退出登录",
+    "email": "邮箱",
+    "password": "密码",
+    "confirmPassword": "确认密码",
+    "name": "姓名",
+    "forgotPassword": "忘记密码？",
+    "loginWithGoogle": "使用 Google 登录",
+    "noAccount": "还没有账户？",
+    "hasAccount": "已有账户？",
+    "loginHere": "在这里登录",
+    "registerHere": "在这里注册",
+    "loginSuccess": "登录成功",
+    "registerSuccess": "注册成功",
+    "loginFailed": "登录失败",
+    "registerFailed": "注册失败",
+    "invalidCredentials": "邮箱或密码错误",
+    "emailAlreadyExists": "邮箱已存在",
+    "passwordsDontMatch": "密码不匹配",
+    "emailRequired": "请输入邮箱",
+    "passwordRequired": "请输入密码",
+    "nameRequired": "请输入姓名",
+    "invalidEmail": "邮箱格式不正确",
+    "passwordTooShort": "密码至少6位",
+    "authRequired": "需要登录才能访问此页面",
+    "redirectingToLogin": "正在跳转到登录页面...",
+    "redirectingMessage": "如果页面没有自动跳转，请点击下方按钮",
+    "goToLogin": "前往登录"
+  },
+  "common": {
+    "loading": "加载中...",
+    "error": "错误",
+    "success": "成功",
+    "unknown": "未知"
   }
 }

@@ -6,6 +6,8 @@ import { useAuth } from '../../stores/authStore';
 import { useRouter } from 'next/navigation';
 import { questionsAPI, subjectsAPI } from '../../lib/api';
 import AppLayout from '../../components/layout/AppLayout';
+import AuthDebugger from '../../components/debug/AuthDebugger';
+import AuthGuard from '../../components/auth/AuthGuard';
 
 interface DashboardStats {
   totalQuestions: number;
@@ -24,7 +26,6 @@ interface DashboardStats {
 export default function DashboardPage() {
   const { t } = useTranslation();
   const { user } = useAuth();
-  const router = useRouter();
   const [stats, setStats] = useState<DashboardStats>({
     totalQuestions: 0,
     thisWeekQuestions: 0,
@@ -78,16 +79,14 @@ export default function DashboardPage() {
     }
   }, [user, t]);
 
-  if (!user) {
-    return <div>{t('common.loading')}</div>;
-  }
-
   return (
-    <AppLayout 
-      title={t('dashboard.title')} 
-      description={t('dashboard.description')}
-      showBreadcrumb={false}
-    >
+    <AuthGuard>
+      <AuthDebugger />
+      <AppLayout
+        title={t('dashboard.title')} 
+        description={t('dashboard.description')}
+        showBreadcrumb={false}
+      >
       {/* Statistics Data Cards */}
       {loading ? (
         <div className="flex justify-center items-center min-h-[200px]">
@@ -244,6 +243,7 @@ export default function DashboardPage() {
           )}
         </div>
       </div>
-    </AppLayout>
+      </AppLayout>
+    </AuthGuard>
   );
 }
