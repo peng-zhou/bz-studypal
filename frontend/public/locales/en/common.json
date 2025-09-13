@@ -4,7 +4,9 @@
   "navigation": {
     "home": "Home",
     "questions": "Questions",
+    "subjects": "Subjects",
     "review": "Review",
+    "reviews": "Reviews",
     "bookmarks": "Bookmarks",
     "profile": "Profile",
     "admin": "Admin"
@@ -107,5 +109,8 @@
     "maxFilesReached": "Maximum number of files reached",
     "fileTooLarge": "File is too large",
     "invalidFileType": "Invalid file type"
+  },
+  "settings": {
+    "profile": "Profile Information"
   }
 }

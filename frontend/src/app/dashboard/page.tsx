@@ -196,7 +196,7 @@ export default function DashboardPage() {
         <div className="bg-white rounded-lg shadow-sm p-6 hover:shadow-md transition-shadow">
           <div className="flex items-center mb-4">
             <div className="text-3xl mr-3">📈</div>
-            <h3 className="text-lg font-semibold text-gray-900">{t('dashboard.learningProgress')}</h3>
+            <h3 className="text-lg font-semibold text-gray-900">{t('dashboard.learningStats')}</h3>
           </div>
           <p className="text-gray-600 mb-4">{t('dashboard.learningStatsDesc')}</p>
           <button className="w-full py-2 px-4 bg-green-600 hover:bg-green-700 text-white rounded-md transition-colors">

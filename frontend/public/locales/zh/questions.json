@@ -107,13 +107,17 @@
     "answerRequired": "请输入答案内容"
   },
   "statistics": {
-    "totalQuestions": "总错题数",
+    "totalQuestions": "总题目数",
     "masteredQuestions": "已掌握",
-    "needReviewQuestions": "需复习",
+    "needReviewQuestions": "需要复习",
     "recentlyAdded": "本周新增",
     "reviewProgress": "复习进度",
     "masteryRate": "掌握率",
     "subjectDistribution": "科目分布",
     "difficultyDistribution": "难度分布"
-  }
+  },
+  "description": "管理您的错题",
+  "thisWeek": "本周",
+  "notMastered": "未掌握",
+  "mastered": "已掌握"
 }

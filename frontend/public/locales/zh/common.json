@@ -3,11 +3,13 @@
   "appTagline": "智能错题管理与复习系统",
   "navigation": {
     "home": "首页",
-    "questions": "错题库",
+    "questions": "错题",
+    "subjects": "科目",
     "review": "复习",
-    "bookmarks": "收藏夹",
-    "profile": "个人中心",
-    "admin": "管理后台"
+    "reviews": "复习计划",
+    "bookmarks": "收藏",
+    "profile": "个人资料",
+    "admin": "管理"
   },
   "actions": {
     "save": "保存",
@@ -107,5 +109,8 @@
     "maxFilesReached": "已达到最大文件数量",
     "fileTooLarge": "文件过大",
     "invalidFileType": "无效的文件类型"
+  },
+  "settings": {
+    "profile": "个人信息"
   }
 }

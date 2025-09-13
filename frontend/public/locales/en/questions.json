@@ -115,5 +115,9 @@
     "masteryRate": "Mastery Rate",
     "subjectDistribution": "Subject Distribution",
     "difficultyDistribution": "Difficulty Distribution"
-  }
+  },
+  "description": "Manage your wrong questions",
+  "thisWeek": "This Week",
+  "notMastered": "Not Mastered",
+  "mastered": "Mastered"
 }
