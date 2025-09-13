@@ -202,7 +202,7 @@ export default function SubjectsPage() {
                   </button>
                   <button
                     onClick={() => handleDelete(subject.id)}
-                    disabled={subject._count?.questions && subject._count.questions > 0}
+                    disabled={!!(subject._count?.questions && subject._count.questions > 0)}
                     className={`flex-1 px-3 py-2 text-sm rounded-md ${
                       subject._count?.questions && subject._count.questions > 0
                         ? 'bg-gray-100 text-gray-400 cursor-not-allowed'

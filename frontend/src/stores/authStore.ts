@@ -52,7 +52,8 @@ export const useAuthStore = create<AuthState>()(
             throw new Error(response.error || 'Login failed');
           }
   } catch (error: unknown) {
-          const errorMessage = error.response?.data?.error || error.message || 'Login failed';
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const errorMessage = (error as any)?.response?.data?.error || (error as any)?.message || 'Login failed';
           set({
             user: null,
             isAuthenticated: false,
@@ -87,7 +88,8 @@ export const useAuthStore = create<AuthState>()(
             throw new Error(response.error || 'Registration failed');
           }
   } catch (error: unknown) {
-          const errorMessage = error.response?.data?.error || error.message || 'Registration failed';
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const errorMessage = (error as any)?.response?.data?.error || (error as any)?.message || 'Registration failed';
           set({
             user: null,
             isAuthenticated: false,
@@ -122,7 +124,8 @@ export const useAuthStore = create<AuthState>()(
             throw new Error(response.error || 'Google login failed');
           }
     } catch (error: unknown) {
-          const errorMessage = error.response?.data?.error || error.message || 'Google login failed';
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const errorMessage = (error as any)?.response?.data?.error || (error as any)?.message || 'Google login failed';
           set({
             user: null,
             isAuthenticated: false,

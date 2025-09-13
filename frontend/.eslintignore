@@ -1,0 +1,17 @@
+node_modules
+.next
+out
+dist
+build
+*.log
+*.config.js
+*.config.ts
+cypress.config.ts
+cypress/
+scripts/
+jest.config.js
+**/__tests__/**
+**/*.test.ts
+**/*.test.tsx
+**/*.spec.ts
+**/*.spec.tsx

@@ -15,9 +15,11 @@ const MAX_RETRIES = 3;
 const RETRY_DELAY = 1000; // 1秒
 
 // 重试函数
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const retryRequest = async (fn: () => Promise<any>, retries = MAX_RETRIES): Promise<any> => {
   try {
     return await fn();
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {
     if (retries > 0 && (error.code === 'ECONNABORTED' || error.code === 'ETIMEDOUT' || error.response?.status >= 500)) {
       console.warn(`Request failed, retrying... (${MAX_RETRIES - retries + 1}/${MAX_RETRIES})`);

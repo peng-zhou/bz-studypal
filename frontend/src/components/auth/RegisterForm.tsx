@@ -56,11 +56,15 @@ const registerSchema = yup.object().shape({
     .required('请确认密码'),
   preferredLanguage: yup
     .string()
-    .oneOf(['zh', 'en'], '请选择有效的语言')
+    .oneOf(['zh', 'en'] as const, '请选择有效的语言')
     .required('请选择首选语言'),
 });
 
-interface RegisterFormData extends RegisterData {
+interface RegisterFormData {
+  email: string;
+  password: string;
+  name: string;
+  preferredLanguage: 'zh' | 'en';
   confirmPassword: string;
 }
 

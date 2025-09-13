@@ -6,6 +6,7 @@ import QuickLogin from '../../components/debug/QuickLogin';
 
 export default function AuthTestPage() {
   const { user, isAuthenticated, isLoading, error, checkAuth, login } = useAuth();
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [localStorageInfo, setLocalStorageInfo] = useState<any>({});
 
   useEffect(() => {

@@ -54,8 +54,10 @@ export default function DashboardPage() {
           const newStats: DashboardStats = {
             totalQuestions: questionStats.totalCount || 0,
             thisWeekQuestions: questionStats.recentWeekCount || 0,
-            notMasteredQuestions: questionStats.byMastery.find(m => m.masteryLevel === 'NOT_MASTERED')?._count || 0,
-            masteredQuestions: questionStats.byMastery.find(m => m.masteryLevel === 'MASTERED')?._count || 0,
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            notMasteredQuestions: questionStats.byMastery.find((m: any) => m.masteryLevel === 'NOT_MASTERED')?._count || 0,
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            masteredQuestions: questionStats.byMastery.find((m: any) => m.masteryLevel === 'MASTERED')?._count || 0,
             totalSubjects: subjectsRes.success ? subjectsRes.data.length : 0,
             recentActivity: [
               {
@@ -141,20 +143,20 @@ export default function DashboardPage() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <label className="text-sm font-medium text-gray-500">{t('dashboard.userInfo.name')}</label>
-            <p className="text-gray-900">{user.name}</p>
+            <p className="text-gray-900">{user?.name}</p>
           </div>
           <div>
             <label className="text-sm font-medium text-gray-500">{t('dashboard.userInfo.email')}</label>
-            <p className="text-gray-900">{user.email}</p>
+            <p className="text-gray-900">{user?.email}</p>
           </div>
           <div>
             <label className="text-sm font-medium text-gray-500">{t('dashboard.userInfo.preferredLanguage')}</label>
-            <p className="text-gray-900">{user.preferredLanguage === 'zh' ? t('dashboard.userInfo.chinese') : t('dashboard.userInfo.english')}</p>
+            <p className="text-gray-900">{user?.preferredLanguage === 'zh' ? t('dashboard.userInfo.chinese') : t('dashboard.userInfo.english')}</p>
           </div>
           <div>
             <label className="text-sm font-medium text-gray-500">{t('dashboard.userInfo.memberSince')}</label>
             <p className="text-gray-900">
-              {user.createdAt ? new Date(user.createdAt).toLocaleDateString('zh-CN') : t('common.unknown')}
+              {user?.createdAt ? new Date(user.createdAt).toLocaleDateString('zh-CN') : t('common.unknown')}
             </p>
           </div>
         </div>
