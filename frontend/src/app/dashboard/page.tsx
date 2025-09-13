@@ -26,6 +26,7 @@ interface DashboardStats {
 export default function DashboardPage() {
   const { t } = useTranslation();
   const { user } = useAuth();
+  const router = useRouter();
   const [stats, setStats] = useState<DashboardStats>({
     totalQuestions: 0,
     thisWeekQuestions: 0,
