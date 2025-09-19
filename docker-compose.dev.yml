@@ -1,0 +1,64 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.dev
+    container_name: studypal-backend-dev
+    ports:
+      - "8000:8000"
+    environment:
+      - NODE_ENV=development
+      - DATABASE_URL=file:./dev.db
+      - JWT_SECRET=dev-jwt-secret-key
+      - REFRESH_TOKEN_SECRET=dev-refresh-token-secret
+      - CORS_ORIGIN=http://localhost:3000
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+      - backend_dev_data:/app/prisma
+      - uploads_dev_data:/app/uploads
+    networks:
+      - studypal-dev-network
+    command: npm run dev
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.dev
+    container_name: studypal-frontend-dev
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=development
+      - NEXT_PUBLIC_API_URL=http://localhost:8000
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+      - /app/.next
+    networks:
+      - studypal-dev-network
+    command: npm run dev
+
+  redis:
+    image: redis:7-alpine
+    container_name: studypal-redis-dev
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_dev_data:/data
+    networks:
+      - studypal-dev-network
+
+volumes:
+  backend_dev_data:
+    driver: local
+  uploads_dev_data:
+    driver: local
+  redis_dev_data:
+    driver: local
+
+networks:
+  studypal-dev-network:
+    driver: bridge
