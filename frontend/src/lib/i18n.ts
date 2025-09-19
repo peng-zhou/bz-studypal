@@ -28,6 +28,18 @@ const enTranslations = {
     showing: 'Showing',
     items: 'items',
     total: 'total',
+    unknown: 'Unknown',
+    actions: {
+      loading: 'Loading...'
+    },
+    imageUpload: {
+      title: 'Images',
+      selectFiles: 'Select Images',
+      dropFiles: 'Drop images here',
+      maxFiles: 'Maximum {{max}} files',
+      uploading: 'Uploading...',
+      remove: 'Remove'
+    }
   },
   navigation: {
     dashboard: 'Dashboard',
@@ -142,10 +154,35 @@ const enTranslations = {
     creating: 'Creating...',
     saving: 'Saving...',
     deleteSelected: 'Delete Selected ({{count}})',
+    bookmarkCount: 'Bookmarks',
+    // Modal titles
+    createQuestionModal: 'Add Question',
+    editQuestionModal: 'Edit Question',
+    // Form labels
+    titleOptional: 'Question Title (Optional)',
+    contentRequiredLabel: 'Question Content *',
+    myAnswerRequiredLabel: 'My Answer *',
+    correctAnswerRequiredLabel: 'Correct Answer *',
+    explanationOptional: 'Explanation (Optional)',
+    subjectRequiredLabel: 'Subject *',
+    // Placeholders
+    enterTitle: 'Enter question title',
+    enterContent: 'Enter question content',
+    enterMyAnswer: 'Enter your answer',
+    enterCorrectAnswer: 'Enter correct answer',
+    enterExplanation: 'Enter explanation',
+    selectSubject: 'Select subject',
+    // Actions
+    creating: 'Creating...',
+    saving: 'Saving...',
   },
   subjects: {
     title: 'Subject Management',
     description: 'Manage your study subjects and categories',
+    list: 'Subjects List',
+    add: 'Add Subject',
+    edit: 'Edit',
+    delete: 'Delete',
     addSubject: 'Add Subject',
     editSubject: 'Edit Subject',
     deleteSubject: 'Delete Subject',
@@ -163,6 +200,47 @@ const enTranslations = {
     subjectDeleted: 'Subject deleted successfully',
     confirmDelete: 'Are you sure you want to delete this subject?',
     cannotDeleteWithQuestions: 'Cannot delete subject with existing questions',
+    // Fields
+    fields: {
+      code: 'Code:',
+      englishName: 'English Name:',
+      description: 'Description:',
+      order: 'Order:',
+      questionCount: 'Questions:'
+    },
+    // Empty state
+    empty: {
+      title: 'No subjects found',
+      description: 'Create your first subject to get started!',
+      action: 'Add Subject'
+    },
+    // Form labels and placeholders
+    form: {
+      code: 'Subject Code',
+      codePlaceholder: 'e.g., math, english',
+      nameZh: 'Chinese Name',
+      nameZhPlaceholder: 'e.g., 数学',
+      nameEn: 'English Name', 
+      nameEnPlaceholder: 'e.g., Mathematics',
+      description: 'Description',
+      descriptionPlaceholder: 'Subject description (optional)',
+      color: 'Color',
+      order: 'Order',
+      cancel: 'Cancel',
+      create: 'Create',
+      update: 'Update'
+    },
+    // Error messages
+    errors: {
+      createFailed: 'Failed to create subject',
+      updateFailed: 'Failed to update subject',
+      deleteFailed: 'Failed to delete subject',
+      submitError: 'Submit error occurred'
+    },
+    // Confirmation messages
+    confirm: {
+      delete: 'Are you sure you want to delete this subject?'
+    },
     // Form validation
     codeRequired: 'Please enter subject code',
     chineseNameRequired: 'Please enter Chinese name',
@@ -181,6 +259,20 @@ const enTranslations = {
     recentActivity: 'Recent Activity',
     upcomingReviews: 'Upcoming Reviews',
     learningProgress: 'Learning Progress',
+    learningStats: 'Learning Statistics',
+    learningStatsDesc: 'View detailed analytics of your learning progress and performance',
+    reviewPlanDesc: 'Start your personalized review session based on spaced repetition',
+    viewStats: 'View Statistics',
+    startReview: 'Start Review',
+    noRecentActivity: 'No recent activities',
+    userInfo: {
+      name: 'Name',
+      email: 'Email',
+      preferredLanguage: 'Preferred Language',
+      memberSince: 'Member Since',
+      chinese: 'Chinese',
+      english: 'English'
+    }
   },
   settings: {
     title: 'Settings',
@@ -219,6 +311,18 @@ const zhTranslations = {
     showing: '显示',
     items: '条，共',
     total: '条',
+    unknown: '未知',
+    actions: {
+      loading: '加载中...'
+    },
+    imageUpload: {
+      title: '图片',
+      selectFiles: '选择图片',
+      dropFiles: '拖拽图片到此处',
+      maxFiles: '最多 {{max}} 个文件',
+      uploading: '上传中...',
+      remove: '删除'
+    }
   },
   navigation: {
     dashboard: '仪表盘',
@@ -333,10 +437,35 @@ const zhTranslations = {
     creating: '创建中...',
     saving: '保存中...',
     deleteSelected: '删除所选 ({{count}})',
+    bookmarkCount: '收藏数',
+    // Modal titles
+    createQuestionModal: '添加错题',
+    editQuestionModal: '编辑错题',
+    // Form labels
+    titleOptional: '错题标题（可选）',
+    contentRequiredLabel: '错题内容 *',
+    myAnswerRequiredLabel: '您的答案 *',
+    correctAnswerRequiredLabel: '正确答案 *',
+    explanationOptional: '解析（可选）',
+    subjectRequiredLabel: '科目 *',
+    // Placeholders
+    enterTitle: '请输入错题标题',
+    enterContent: '请输入错题内容',
+    enterMyAnswer: '请输入您的答案',
+    enterCorrectAnswer: '请输入正确答案',
+    enterExplanation: '请输入错题解析',
+    selectSubject: '请选择科目',
+    // Actions
+    creating: '创建中...',
+    saving: '保存中...',
   },
   subjects: {
     title: '科目管理',
     description: '管理您的学习科目和分类',
+    list: '科目列表',
+    add: '添加科目',
+    edit: '编辑',
+    delete: '删除',
     addSubject: '添加科目',
     editSubject: '编辑科目',
     deleteSubject: '删除科目',
@@ -354,6 +483,47 @@ const zhTranslations = {
     subjectDeleted: '科目删除成功',
     confirmDelete: '确定要删除这个科目吗？',
     cannotDeleteWithQuestions: '不能删除包含错题的科目',
+    // Fields
+    fields: {
+      code: '代码：',
+      englishName: '英文名称：',
+      description: '描述：',
+      order: '排序：',
+      questionCount: '错题数：'
+    },
+    // Empty state
+    empty: {
+      title: '暂无科目',
+      description: '创建您的第一个科目开始吧！',
+      action: '添加科目'
+    },
+    // Form labels and placeholders
+    form: {
+      code: '科目代码',
+      codePlaceholder: '如: math, english',
+      nameZh: '中文名称',
+      nameZhPlaceholder: '如: 数学',
+      nameEn: '英文名称',
+      nameEnPlaceholder: '如: Mathematics',
+      description: '描述',
+      descriptionPlaceholder: '科目描述（可选）',
+      color: '颜色',
+      order: '排序',
+      cancel: '取消',
+      create: '创建',
+      update: '更新'
+    },
+    // Error messages
+    errors: {
+      createFailed: '创建科目失败',
+      updateFailed: '更新科目失败',
+      deleteFailed: '删除科目失败',
+      submitError: '提交错误'
+    },
+    // Confirmation messages
+    confirm: {
+      delete: '确定要删除这个科目吗？'
+    },
     // Form validation
     codeRequired: '请输入科目代码',
     chineseNameRequired: '请输入中文名称',
@@ -372,6 +542,20 @@ const zhTranslations = {
     recentActivity: '最近活动',
     upcomingReviews: '待复习',
     learningProgress: '学习进度',
+    learningStats: '学习统计',
+    learningStatsDesc: '查看详细的学习进度和表现分析',
+    reviewPlanDesc: '开始基于间隔重复的个性化复习计划',
+    viewStats: '查看统计',
+    startReview: '开始复习',
+    noRecentActivity: '暂无最近活动',
+    userInfo: {
+      name: '姓名',
+      email: '邮箱',
+      preferredLanguage: '首选语言',
+      memberSince: '注册时间',
+      chinese: '中文',
+      english: '英文'
+    }
   },
   settings: {
     title: '设置',
